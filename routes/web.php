@@ -2,10 +2,10 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\DashboardController;
 
-Route::get('/', function () {
-    return view('admin.dashboard');
-});
+Route::get('/', [DashboardController::class, 'index'])
+    ->name('admin.dashboard');
 
 Route::get('/dashboard', function () {
     return view('dashboard');

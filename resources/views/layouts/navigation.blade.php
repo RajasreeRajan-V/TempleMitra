@@ -1,7 +1,7 @@
 <aside class="sidebar">
     <div class="sidebar-brand">
         <div class="sidebar-emblem">ॐ</div>
-        <h1 class="sidebar-title">Sree Mahaganapathi</h1>
+        <h1 class="sidebar-title">{{ config('app.name', 'TempleMitra') }}</h1>
         <p class="sidebar-subtitle">Vazhipad Management</p>
     </div>
 

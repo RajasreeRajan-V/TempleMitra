@@ -553,7 +553,7 @@
       </div>
       <div class="role-note" id="roleNote">Access vazhipad, devotees, prasadam and daily temple operations.</div>
 
-      <form method="POST" action="{{ route('login') }}" id="loginForm">
+      <form method="POST" action="{{ route('login.store') }}" id="loginForm">
         @csrf
         <input type="hidden" name="login_type" id="loginType" value="{{ old('login_type', 'temple') }}" />
 

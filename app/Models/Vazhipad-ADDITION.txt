@@ -1,0 +1,15 @@
+<?php
+/**
+ * Add this method inside your EXISTING App\Models\Vazhipad class.
+ * Assumes Vazhipad has a `price` column used to auto-fill the amount on the form.
+ */
+
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\ReceiptItem;
+
+// ... inside class Vazhipad ...
+
+public function receiptItems(): HasMany
+{
+    return $this->hasMany(ReceiptItem::class);
+}

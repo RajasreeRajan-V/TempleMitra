@@ -68,7 +68,7 @@
                     <div class="temple-profile-info">
                         <h3 class="temple-profile-name">{{ $temple->temple_name }}</h3>
                         @if($temple->registration_number)
-                            <p class="temple-profile-reg">Reg. No: {{ $temple->registration_number }}</p>
+                            <p class="temple-profile-reg print-hide">Reg. No: {{ $temple->registration_number }}</p>
                         @endif
                         <p class="temple-profile-location">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -85,7 +85,7 @@
                         <label class="info-label">Temple Name</label>
                         <p class="info-value">{{ $temple->temple_name }}</p>
                     </div>
-                    <div class="info-item">
+                    <div class="info-item print-hide">
                         <label class="info-label">Registration Number</label>
                         <p class="info-value">{{ $temple->registration_number ?? 'N/A' }}</p>
                     </div>
@@ -109,6 +109,49 @@
                         <label class="info-label">Address</label>
                         <p class="info-value">{{ $temple->address ?? 'Not specified' }}</p>
                     </div>
+                    
+                    <!-- Password Display (hidden on print) -->
+                    <div class="info-item full-width password-section print-hide">
+                        <label class="info-label">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-3px;">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                            </svg>
+                            Login Password
+                        </label>
+                        <div class="password-display-wrapper">
+                            <div class="password-value" id="passwordDisplay">
+                                @php
+                                    $decryptedPassword = '';
+                                    try {
+                                        $decryptedPassword = \Illuminate\Support\Facades\Crypt::decryptString($temple->password);
+                                    } catch (\Exception $e) {
+                                        $decryptedPassword = 'Unable to decrypt password';
+                                    }
+                                @endphp
+                                <span id="passwordText" class="password-hidden">••••••••••••</span>
+                                <span id="passwordRevealed" class="password-revealed" style="display: none;">
+                                    {{ $decryptedPassword }}
+                                </span>
+                            </div>
+                            <div class="password-actions">
+                                <button type="button" class="password-toggle-btn" id="togglePasswordBtn" title="Toggle password visibility">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                        <circle cx="12" cy="12" r="3"/>
+                                    </svg>
+                                </button>
+                                <button type="button" class="password-copy-btn" id="copyPasswordBtn" title="Copy password">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <small class="password-hint">Password is encrypted and stored securely.</small>
+                    </div>
+                    
                     @if($temple->description)
                         <div class="info-item full-width">
                             <label class="info-label">Description</label>
@@ -176,7 +219,7 @@
                                 <span class="meta-value">{{ $temple->updated_at->diffForHumans() }}</span>
                             </div>
                         </div>
-                        <div class="meta-item">
+                        <div class="meta-item print-hide">
                             <span class="meta-icon">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -192,8 +235,8 @@
                 </div>
             </div>
 
-            <!-- Quick Actions -->
-            <div class="details-card">
+            <!-- Quick Actions (hidden on print) -->
+            <div class="details-card print-hide" id="quickActionsCard">
                 <div class="details-card-header">
                     <h2 class="details-card-title">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -215,7 +258,18 @@
                             </svg>
                             <span>Edit Temple</span>
                         </a>
-                        <a href="#" class="action-card action-card--print" onclick="window.print()">
+                        
+                        <!-- Change Password Button -->
+                        <button type="button" class="action-card action-card--password" id="openChangePasswordModal">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                                <circle cx="12" cy="16" r="1"/>
+                            </svg>
+                            <span>Change Password</span>
+                        </button>
+                        
+                        <a href="#" class="action-card action-card--print" id="printDetailsBtn" onclick="window.print(); return false;">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="6 9 6 2 18 2 18 9"/>
                                 <path d="M18 9h3v6h-3"/>
@@ -225,30 +279,15 @@
                             </svg>
                             <span>Print Details</span>
                         </a>
-                        <form method="POST" action="{{ route('admin.temples-registration.destroy', $temple->id) }}" 
-                              onsubmit="return confirm('Are you sure you want to delete this temple?')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="action-card action-card--danger">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="3 6 5 6 21 6"/>
-                                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-                                    <path d="M10 11v6"/>
-                                    <path d="M14 11v6"/>
-                                    <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-                                </svg>
-                                <span>Delete Temple</span>
-                            </button>
-                        </form>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Map Section (Optional) -->
+    <!-- Map Section (Optional, hidden on print) -->
     @if($temple->latitude && $temple->longitude)
-        <div class="details-card" style="margin-top: 24px;">
+        <div class="details-card print-hide" style="margin-top: 24px;">
             <div class="details-card-header">
                 <h2 class="details-card-title">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -259,7 +298,6 @@
             </div>
             <div class="details-card-body">
                 <div id="temple-map" style="height: 300px; border-radius: 12px; background: var(--cream-100);">
-                    <!-- Map implementation would go here -->
                     <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--ink-400);">
                         <p>Map integration requires Google Maps or Leaflet implementation</p>
                     </div>
@@ -267,6 +305,68 @@
             </div>
         </div>
     @endif
+
+    <!-- Change Password Modal -->
+    <div id="changePasswordModal" class="modal-overlay" style="display: none;">
+        <div class="modal-container modal-container--password">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                    </svg>
+                    Change Password
+                </h2>
+                <button type="button" class="modal-close" id="closeChangePasswordModal">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <form method="POST" action="{{ route('admin.temples-registration.change-password', $temple->id) }}" id="changePasswordForm">
+                @csrf
+                @method('PATCH')
+                <div class="modal-body">
+                    <div class="password-change-info">
+                        <p>Change the login password for <strong>{{ $temple->temple_name }}</strong></p>
+                        <p style="font-size: 13px; color: var(--ink-400);">The new password will be encrypted and stored securely.</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="new_password">New Password</label>
+                        <input type="password" id="new_password" name="password" class="form-input" required minlength="8" placeholder="Enter new password (min 8 characters)">
+                        <small class="form-hint">Minimum 8 characters</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="new_password_confirmation">Confirm Password</label>
+                        <input type="password" id="new_password_confirmation" name="password_confirmation" class="form-input" required placeholder="Confirm new password">
+                    </div>
+                    
+                    <div class="password-strength" id="passwordStrength">
+                        <div class="strength-bar">
+                            <div class="strength-level" id="strengthLevel" style="width: 0%;"></div>
+                        </div>
+                        <span class="strength-text" id="strengthText">Password strength: <span id="strengthLabel">Weak</span></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" id="cancelChangePassword">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="submitPasswordChange">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h6"/>
+                            <polygon points="18 2 22 6 12 16 8 16 8 12 18 2"/>
+                        </svg>
+                        Update Password
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Copy Toast Notification -->
+    <div id="copyToast" class="copy-toast">Copied to clipboard</div>
 @endsection
 
 @push('styles')
@@ -409,6 +509,81 @@
             line-height: 1.6;
         }
 
+        /* Password Display */
+        .password-section {
+            background: var(--cream-50);
+            padding: 16px 20px;
+            border-radius: 12px;
+            border: 1px solid var(--line);
+        }
+
+        .password-display-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 4px;
+        }
+
+        .password-value {
+            flex: 1;
+            font-size: 18px;
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+            color: var(--ink-900);
+            letter-spacing: 1px;
+            padding: 6px 0;
+        }
+
+        .password-hidden {
+            letter-spacing: 4px;
+            color: var(--ink-500);
+        }
+
+        .password-revealed {
+            color: var(--maroon-700);
+            word-break: break-all;
+        }
+
+        .password-actions {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .password-toggle-btn,
+        .password-copy-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 1px solid var(--line);
+            background: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--ink-600);
+            transition: all 0.15s ease;
+        }
+
+        .password-toggle-btn:hover,
+        .password-copy-btn:hover {
+            background: var(--cream-100);
+            border-color: var(--maroon-600);
+            color: var(--maroon-600);
+        }
+
+        .password-toggle-btn:active,
+        .password-copy-btn:active {
+            transform: scale(0.95);
+        }
+
+        .password-hint {
+            font-size: 12px;
+            color: var(--ink-400);
+            margin-top: 6px;
+            display: block;
+        }
+
         /* Status Badge */
         .status-badge {
             display: inline-flex;
@@ -494,6 +669,7 @@
             transition: all 0.2s ease;
             cursor: pointer;
             text-align: center;
+            width: 100%;
         }
 
         .action-card:hover {
@@ -507,6 +683,15 @@
             color: var(--maroon-600);
         }
 
+        .action-card--password:hover {
+            border-color: #f39c12;
+            background: #fef9e7;
+        }
+
+        .action-card--password:hover svg {
+            color: #f39c12;
+        }
+
         .action-card--print:hover {
             border-color: #2980b9;
             background: #ebf5fb;
@@ -516,17 +701,277 @@
             color: #2980b9;
         }
 
-        .action-card--danger {
-            border-color: #fee;
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn 0.2s ease;
         }
 
-        .action-card--danger:hover {
-            border-color: #c0392b;
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-container {
+            background: #fff;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+            overflow: hidden;
+        }
+
+        .modal-container--password {
+            max-width: 450px;
+        }
+
+        .modal-container form {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--line);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--cream-50);
+            flex-shrink: 0;
+        }
+
+        .modal-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--ink-900);
+            margin: 0;
+        }
+
+        .modal-title svg {
+            color: var(--maroon-600);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            padding: 8px;
+            cursor: pointer;
+            color: var(--ink-400);
+            border-radius: 8px;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
             background: #fee;
+            color: #c0392b;
         }
 
-        .action-card--danger svg {
-            color: #c0392b;
+        .modal-body {
+            padding: 24px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .modal-footer {
+            padding: 20px 24px;
+            border-top: 1px solid var(--line);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            background: var(--cream-50);
+            flex-shrink: 0;
+            margin-top: auto;
+        }
+
+        .password-change-info {
+            margin-bottom: 20px;
+        }
+
+        .password-change-info p {
+            margin: 0 0 4px 0;
+            color: var(--ink-700);
+        }
+
+        /* Form Styles */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ink-600);
+        }
+
+        .form-input {
+            padding: 10px 14px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            font-size: 14px;
+            background: #fff;
+            color: var(--ink-900);
+            font-family: inherit;
+            width: 100%;
+            transition: all 0.15s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--maroon-600);
+            box-shadow: 0 0 0 3px rgba(124, 31, 44, 0.1);
+        }
+
+        .form-input.error {
+            border-color: #c0392b !important;
+            box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.15) !important;
+        }
+
+        .form-hint {
+            font-size: 12px;
+            color: var(--ink-400);
+        }
+
+        /* Password Strength */
+        .password-strength {
+            margin-top: 8px;
+        }
+
+        .strength-bar {
+            width: 100%;
+            height: 4px;
+            background: #e9ecef;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .strength-level {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.3s ease, background-color 0.3s ease;
+        }
+
+        .strength-text {
+            font-size: 12px;
+            color: var(--ink-400);
+            margin-top: 4px;
+            display: block;
+        }
+
+        .strength-text #strengthLabel {
+            font-weight: 600;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-decoration: none;
+            background: #fff;
+            color: var(--ink-700);
+        }
+
+        .btn-outline {
+            border-color: var(--line);
+            background: transparent;
+        }
+
+        .btn-outline:hover {
+            background: var(--cream-50);
+            border-color: var(--ink-400);
+        }
+
+        .btn-primary {
+            background: var(--maroon-700);
+            color: #fff;
+            border-color: var(--maroon-700);
+        }
+
+        .btn-primary:hover {
+            background: var(--maroon-800);
+            border-color: var(--maroon-800);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(124, 31, 44, 0.2);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Copy Toast */
+        .copy-toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #2c3e50;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            z-index: 9999;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .copy-toast.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
         }
 
         /* Responsive */
@@ -558,6 +1003,17 @@
             .action-grid {
                 grid-template-columns: 1fr 1fr;
             }
+
+            .password-display-wrapper {
+                flex-wrap: wrap;
+            }
+
+            .modal-container {
+                max-width: 100%;
+                max-height: 100vh;
+                border-radius: 0;
+                margin: 0;
+            }
         }
 
         @media (max-width: 480px) {
@@ -573,24 +1029,414 @@
                 width: 100%;
                 justify-content: center;
             }
+
+            .modal-header {
+                padding: 16px 20px;
+            }
+
+            .modal-body {
+                padding: 16px;
+            }
+
+            .modal-footer {
+                padding: 16px 20px;
+                flex-direction: column;
+            }
+
+            .modal-footer .btn {
+                width: 100%;
+                justify-content: center;
+            }
         }
 
-        /* Print Styles */
+        /* ============================
+           Print Styles — single page
+           ============================ */
         @media print {
+            @page {
+                size: A4;
+                margin: 10mm 12mm;
+            }
+
+            html, body {
+                background: #fff !important;
+                font-size: 11px !important;
+            }
+
+            /* Hide everything that isn't part of the printable report
+               (print-hide covers: registration number, password section,
+               quick actions, map, page header) */
+            .page-header,
             .page-header-actions,
-            .action-grid,
-            .details-card--main .details-card-header .status-badge {
+            #quickActionsCard,
+            .print-hide,
+            .details-card--main .details-card-header .status-badge,
+            .modal-overlay,
+            .copy-toast {
                 display: none !important;
+            }
+
+            /* Keep the two-column layout on paper — stacking to one column
+               makes the sheet run long. Side-by-side uses far less height. */
+            .details-grid {
+                display: grid !important;
+                grid-template-columns: 1fr 230px !important;
+                gap: 12px !important;
+                margin-top: 0 !important;
+            }
+
+            .details-card--main {
+                grid-row: auto !important;
             }
 
             .details-card {
                 break-inside: avoid;
+                page-break-inside: avoid;
                 border: 1px solid #ddd !important;
+                box-shadow: none !important;
+                border-radius: 6px !important;
+                margin-bottom: 10px !important;
             }
 
             .details-card-header {
+                padding: 8px 12px !important;
                 background: #f8f8f8 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .details-card-title {
+                font-size: 13px !important;
+                gap: 6px !important;
+            }
+
+            .details-card-title svg {
+                width: 14px !important;
+                height: 14px !important;
+            }
+
+            .details-card-body {
+                padding: 10px 12px !important;
+            }
+
+            /* Compact the temple profile block */
+            .temple-profile {
+                gap: 12px !important;
+                padding-bottom: 10px !important;
+                margin-bottom: 10px !important;
+            }
+
+            .temple-logo-img,
+            .temple-logo-placeholder-large {
+                width: 64px !important;
+                height: 64px !important;
+                border-radius: 8px !important;
+            }
+
+            .temple-logo-placeholder-large svg,
+            .temple-logo-placeholder-large i {
+                font-size: 24px !important;
+            }
+
+            .temple-profile-name {
+                font-size: 15px !important;
+                margin: 0 0 2px 0 !important;
+            }
+
+            .temple-profile-reg {
+                font-size: 10px !important;
+                margin: 0 0 4px 0 !important;
+            }
+
+            .temple-profile-location {
+                font-size: 10px !important;
+            }
+
+            /* Compact the info grid */
+            .info-grid {
+                gap: 8px 16px !important;
+            }
+
+            .info-item {
+                gap: 1px !important;
+            }
+
+            .info-label {
+                font-size: 8.5px !important;
+            }
+
+            .info-value {
+                font-size: 10.5px !important;
+                line-height: 1.35 !important;
+            }
+
+            /* Compact the meta list */
+            .meta-list {
+                gap: 8px !important;
+            }
+
+            .meta-icon {
+                width: 22px !important;
+                height: 22px !important;
+            }
+
+            .meta-icon svg {
+                width: 13px !important;
+                height: 13px !important;
+            }
+
+            .meta-label {
+                font-size: 8.5px !important;
+            }
+
+            .meta-value {
+                font-size: 10.5px !important;
+            }
+
+            .status-badge {
+                padding: 2px 8px !important;
+                font-size: 10px !important;
+            }
+
+            .temple-profile,
+            .info-grid,
+            .meta-item {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+
+            /* Avoid clipping/scroll on long content */
+            .modal-body,
+            .details-card-body {
+                overflow: visible !important;
+            }
+
+            a[href]:after {
+                content: "" !important;
             }
         }
     </style>
+@endpush
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Password toggle and copy functionality
+            const toggleBtn = document.getElementById('togglePasswordBtn');
+            const copyBtn = document.getElementById('copyPasswordBtn');
+            const passwordText = document.getElementById('passwordText');
+            const passwordRevealed = document.getElementById('passwordRevealed');
+            const toast = document.getElementById('copyToast');
+            let isVisible = false;
+
+            // Toggle password visibility
+            toggleBtn.addEventListener('click', function() {
+                isVisible = !isVisible;
+                if (isVisible) {
+                    passwordText.style.display = 'none';
+                    passwordRevealed.style.display = 'inline';
+                    this.innerHTML = `
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                            <line x1="1" y1="1" x2="23" y2="23"/>
+                        </svg>
+                    `;
+                    this.title = 'Hide password';
+                } else {
+                    passwordText.style.display = 'inline';
+                    passwordRevealed.style.display = 'none';
+                    this.innerHTML = `
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                    `;
+                    this.title = 'Toggle password visibility';
+                }
+            });
+
+            // Copy password
+            copyBtn.addEventListener('click', function() {
+                const password = passwordRevealed.textContent.trim();
+                if (password && password !== 'Unable to decrypt password') {
+                    navigator.clipboard.writeText(password).then(() => {
+                        showToast();
+                    }).catch(() => {
+                        const tempInput = document.createElement('input');
+                        tempInput.value = password;
+                        document.body.appendChild(tempInput);
+                        tempInput.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(tempInput);
+                        showToast();
+                    });
+                } else {
+                    alert('Unable to copy password. Please check if the password is valid.');
+                }
+            });
+
+            function showToast() {
+                toast.classList.add('show');
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 2000);
+            }
+
+            // =============================================
+            // PRINT BUTTON (belt-and-braces JS handler)
+            // =============================================
+            const printBtn = document.getElementById('printDetailsBtn');
+            if (printBtn) {
+                printBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.print();
+                });
+            }
+
+            // =============================================
+            // CHANGE PASSWORD MODAL FUNCTIONALITY
+            // =============================================
+            const modal = document.getElementById('changePasswordModal');
+            const openModalBtn = document.getElementById('openChangePasswordModal');
+            const closeModalBtn = document.getElementById('closeChangePasswordModal');
+            const cancelBtn = document.getElementById('cancelChangePassword');
+            const passwordForm = document.getElementById('changePasswordForm');
+            const newPasswordInput = document.getElementById('new_password');
+            const confirmPasswordInput = document.getElementById('new_password_confirmation');
+            const submitBtn = document.getElementById('submitPasswordChange');
+
+            // Password strength elements
+            const strengthLevel = document.getElementById('strengthLevel');
+            const strengthLabel = document.getElementById('strengthLabel');
+
+            // Open modal
+            openModalBtn.addEventListener('click', function() {
+                modal.style.display = 'flex';
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                newPasswordInput.value = '';
+                confirmPasswordInput.value = '';
+                strengthLevel.style.width = '0%';
+                strengthLabel.textContent = 'Weak';
+                strengthLevel.style.backgroundColor = '#dc3545';
+                newPasswordInput.classList.remove('error');
+                confirmPasswordInput.classList.remove('error');
+            });
+
+            // Close modal functions
+            function closeModal() {
+                modal.style.display = 'none';
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            closeModalBtn.addEventListener('click', closeModal);
+            cancelBtn.addEventListener('click', closeModal);
+
+            // Close on outside click
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+
+            // Close on Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && modal.classList.contains('active')) {
+                    closeModal();
+                }
+            });
+
+            // Password strength checker
+            function checkPasswordStrength(password) {
+                let strength = 0;
+                let label = 'Weak';
+                let color = '#dc3545';
+                let width = 25;
+
+                if (password.length >= 8) strength += 1;
+                if (password.length >= 12) strength += 1;
+                if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength += 1;
+                if (/\d/.test(password)) strength += 1;
+                if (/[^a-zA-Z0-9]/.test(password)) strength += 1;
+
+                if (strength <= 2) {
+                    label = 'Weak';
+                    color = '#dc3545';
+                    width = 25;
+                } else if (strength === 3) {
+                    label = 'Fair';
+                    color = '#f39c12';
+                    width = 50;
+                } else if (strength === 4) {
+                    label = 'Good';
+                    color = '#3498db';
+                    width = 75;
+                } else if (strength >= 5) {
+                    label = 'Strong';
+                    color = '#27ae60';
+                    width = 100;
+                }
+
+                return { label, color, width };
+            }
+
+            // Update password strength on input
+            newPasswordInput.addEventListener('input', function() {
+                const password = this.value;
+                if (password.length === 0) {
+                    strengthLevel.style.width = '0%';
+                    strengthLabel.textContent = 'Weak';
+                    strengthLevel.style.backgroundColor = '#dc3545';
+                    return;
+                }
+
+                const result = checkPasswordStrength(password);
+                strengthLevel.style.width = result.width + '%';
+                strengthLevel.style.backgroundColor = result.color;
+                strengthLabel.textContent = result.label;
+            });
+
+            // Form validation
+            passwordForm.addEventListener('submit', function(e) {
+                let isValid = true;
+                const password = newPasswordInput.value;
+                const confirm = confirmPasswordInput.value;
+
+                // Validate password length
+                if (password.length < 8) {
+                    newPasswordInput.classList.add('error');
+                    isValid = false;
+                } else {
+                    newPasswordInput.classList.remove('error');
+                }
+
+                // Validate password match
+                if (password !== confirm) {
+                    confirmPasswordInput.classList.add('error');
+                    isValid = false;
+                } else {
+                    confirmPasswordInput.classList.remove('error');
+                }
+
+                if (!isValid) {
+                    e.preventDefault();
+                    if (password.length < 8) {
+                        alert('Password must be at least 8 characters long.');
+                    } else if (password !== confirm) {
+                        alert('Passwords do not match.');
+                    }
+                }
+            });
+
+            // Clear errors on input
+            newPasswordInput.addEventListener('input', function() {
+                this.classList.remove('error');
+            });
+
+            confirmPasswordInput.addEventListener('input', function() {
+                this.classList.remove('error');
+            });
+        });
+    </script>
 @endpush

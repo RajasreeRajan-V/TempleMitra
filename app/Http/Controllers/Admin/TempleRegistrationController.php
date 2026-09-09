@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\TemplePasswordGeneratedMail;
+use Illuminate\Support\Facades\Storage;
 class TempleRegistrationController extends Controller
 {
     /**
@@ -161,7 +162,8 @@ class TempleRegistrationController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $temple = TemplesRegistration::findOrFail($id);
+        return view('admin.registration.edit', compact('temple'));
     }
 
     /**
@@ -169,14 +171,104 @@ class TempleRegistrationController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $temple = TemplesRegistration::findOrFail($id);
+
+        $validated = $request->validate([
+            'temple_name' => 'required|string|max:255',
+            'address' => 'required|string',
+            'district' => 'required|string|max:255',
+            'location' => 'nullable|string|max:255',
+            'contact_number' => [
+                'nullable',
+                'string',
+                'max:20',
+                'regex:/^[0-9+\-\s()]{10,20}$/',
+            ],
+            'email' => 'nullable|email|max:255|unique:temples_registration,email,' . $id,
+            'description' => 'nullable|string',
+            'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'registration_number' => 'nullable|string|max:255',
+            'status' => 'nullable|in:active,inactive',
+        ]);
+
+        // Handle logo upload
+        if ($request->hasFile('logo')) {
+            // Delete old logo if exists
+            if ($temple->logo && Storage::disk('public')->exists($temple->logo)) {
+                Storage::disk('public')->delete($temple->logo);
+            }
+            $validated['logo'] = $request->file('logo')
+                ->store('temples/logos', 'public');
+        }
+
+        // Remove logo from validated if not uploaded (keep existing)
+        if (!$request->hasFile('logo')) {
+            unset($validated['logo']);
+        }
+
+        $temple->update($validated);
+
+        return redirect()
+            ->route('admin.temples-registration.show', $temple->id)
+            ->with('success', 'Temple updated successfully.');
     }
+
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
     {
-        //
+        $temple = TemplesRegistration::findOrFail($id);
+
+        // Delete temple logo from storage if it exists
+        if ($temple->logo) {
+            Storage::disk('public')->delete($temple->logo);
+        }
+
+        // Delete temple record
+        $temple->delete();
+
+        return redirect()
+            ->route('admin.temples-registration.index')
+            ->with('success', 'Temple deleted successfully.');
     }
+
+    public function changePassword(Request $request, string $id)
+    {
+        $temple = TemplesRegistration::findOrFail($id);
+
+        $request->validate([
+            'password' => 'required|min:8|confirmed',
+        ]);
+
+        // Encrypt the new password
+        $temple->password = Crypt::encryptString($request->password);
+        $temple->save();
+
+        return redirect()
+            ->route('admin.temples-registration.show', $temple->id)
+            ->with('success', 'Password updated successfully.');
+    }
+
+    public function deactivate(string $id)
+    {
+        $temple = TemplesRegistration::findOrFail($id);
+
+        $temple->status = 'inactive';
+        $temple->save();
+
+        return redirect()
+            ->route('admin.temples-registration.index')
+            ->with('success', 'Temple registration deactivated successfully.');
+    }
+
+    public function activate(string $id)
+    {
+        $temple = TemplesRegistration::findOrFail($id);
+        $temple->status = 'active';
+        $temple->save();
+        return redirect()->route('admin.temples-registration.index')->with('success', 'Temple registration activated successfully.');
+    }
+
 }

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
- <title>Sign In · {{ config('app.name') }}</title>
+  <title>Sign In · {{ config('app.name') }}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet" />
   <style>
@@ -553,7 +553,12 @@
       </div>
       <div class="role-note" id="roleNote">Access vazhipad, devotees, prasadam and daily temple operations.</div>
 
-      <form method="POST" action="{{ route('login.store') }}" id="loginForm">
+      {{-- 
+        DYNAMIC ACTION: the form action will be swapped by JavaScript
+        based on the selected role. 
+        Default action points to temple login route.
+      --}}
+      <form method="POST" action="{{ route('temple.login.store') }}" id="loginForm">
         @csrf
         <input type="hidden" name="login_type" id="loginType" value="{{ old('login_type', 'temple') }}" />
 
@@ -623,7 +628,8 @@
       usernameLabel: 'Username or email',
       placeholder: 'anand@sreemahaganapathi.org',
       btnText: 'Sign in to Temple Dashboard',
-      footer: 'New to the temple office? <a href="#">Request access</a>'
+      footer: 'New to the temple office? <a href="#">Request access</a>',
+      action: '{{ route("temple.login.store") }}'
     },
     admin: {
       kicker: 'System administration',
@@ -638,13 +644,15 @@
       usernameLabel: 'Admin username or email',
       placeholder: 'admin@sreemahaganapathi.org',
       btnText: 'Sign in to Admin Dashboard',
-      footer: 'Need admin access? <a href="#">Contact IT support</a>'
+      footer: 'Need admin access? <a href="#">Contact IT support</a>',
+      action: '{{ route("login.store") }}'
     }
   };
 
   function setRole(role) {
     const c = content[role];
 
+    // Update left panel
     document.getElementById('panelKicker').textContent = c.kicker;
     document.getElementById('panelHeadline').innerHTML = c.headline;
     document.getElementById('panelCopy').textContent = c.copy;
@@ -655,26 +663,33 @@
       statEls[i].querySelector('.label').textContent = s.label;
     });
 
+    // Update form labels & placeholder
     document.getElementById('roleNote').textContent = c.roleNote;
     document.getElementById('usernameLabel').textContent = c.usernameLabel;
     document.getElementById('username').placeholder = c.placeholder;
     document.getElementById('signinBtn').textContent = c.btnText;
     document.getElementById('footerNote').innerHTML = c.footer;
 
+    // Update hidden login_type
+    document.getElementById('loginType').value = role;
+
+    // Toggle active tab / ARIA
     document.getElementById('tabTemple').classList.toggle('active', role === 'temple');
     document.getElementById('tabAdmin').classList.toggle('active', role === 'admin');
     document.getElementById('tabTemple').setAttribute('aria-selected', role === 'temple');
     document.getElementById('tabAdmin').setAttribute('aria-selected', role === 'admin');
 
-    // Keep the hidden field in sync so the controller knows which
-    // dashboard was requested.
-    document.getElementById('loginType').value = role;
+    // ** CRITICAL: update the form action **
+    const form = document.getElementById('loginForm');
+    if (c.action) {
+      form.action = c.action;
+    }
   }
 
-  // Re-apply the correct tab styling/content on load in case validation
-  // failed and the page reloaded with `old('login_type')`.
+  // On page load, sync with the current login_type value
   document.addEventListener('DOMContentLoaded', () => {
-    setRole(document.getElementById('loginType').value || 'temple');
+    const initialRole = document.getElementById('loginType').value || 'temple';
+    setRole(initialRole);
   });
 </script>
 

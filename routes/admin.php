@@ -20,4 +20,7 @@ Route::prefix('admin')
         
         Route::post('temples-registration/{id}/generate-password', [TempleRegistrationController::class, 'generatePassword'])
             ->name('temples-registration.generate-password');
+
+        Route::patch('temples-registration/{id}/change-password', [TempleRegistrationController::class, 'changePassword'])
+             ->name('temples-registration.change-password');
     });

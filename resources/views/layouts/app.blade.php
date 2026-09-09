@@ -22,7 +22,6 @@
         <div class="main-col">
             <header class="topbar">
                 <nav class="breadcrumb" aria-label="Breadcrumb">
-                    <a href="{{ route('dashboard') }}">Home</a>
                     <span>&rsaquo;</span>
                     <span class="current">{{ $breadcrumb ?? 'Dashboard' }}</span>
                 </nav>

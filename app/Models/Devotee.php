@@ -5,16 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Vazhipad extends Model
+class Devotee extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'description', 'amount', 'is_active'];
-
-    protected $casts = [
-        'amount' => 'decimal:2',
-        'is_active' => 'boolean',
-    ];
+    protected $fillable = ['name', 'phone', 'email', 'address', 'star'];
 
     public function receipts()
     {

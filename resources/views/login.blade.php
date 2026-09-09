@@ -508,7 +508,7 @@
     <div class="panel-body">
       <div class="kicker" id="panelKicker">Temple administration</div>
       <h1 id="panelHeadline">Every offering,<br />recorded with care.</h1>
-      <p id="panelCopy">Sign in to manage vazhipad bookings, devotee records, and daily prasadam — all in one place, kept as orderly as the sanctum itself.</p>
+      <p id="panelCopy">Sign in to manage vazhipad receiptss, devotee records, and daily prasadam — all in one place, kept as orderly as the sanctum itself.</p>
     </div>
 
     <div class="panel-stats">
@@ -518,7 +518,7 @@
       </div>
       <div>
         <div class="num">3,642</div>
-        <div class="label">Bookings this month</div>
+        <div class="label">receiptss this month</div>
       </div>
       <div>
         <div class="num">27</div>
@@ -613,10 +613,10 @@
     temple: {
       kicker: 'Temple administration',
       headline: 'Every offering,<br />recorded with care.',
-      copy: 'Sign in to manage vazhipad bookings, devotee records, and daily prasadam — all in one place, kept as orderly as the sanctum itself.',
+      copy: 'Sign in to manage vazhipad receiptss, devotee records, and daily prasadam — all in one place, kept as orderly as the sanctum itself.',
       stats: [
         { num: '155', label: 'Vazhipad today' },
-        { num: '3,642', label: 'Bookings this month' },
+        { num: '3,642', label: 'receiptss this month' },
         { num: '27', label: 'Pending approvals' }
       ],
       roleNote: 'Access vazhipad, devotees, prasadam and daily temple operations.',

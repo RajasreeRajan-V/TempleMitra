@@ -15,6 +15,7 @@
    
     @stack('styles')
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/temple.css') }}">
 </head>
 <body>
     <div class="app-shell">
@@ -31,7 +32,7 @@
                 <div class="topbar-actions">
                     <label class="search-box">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-                        <input type="search" placeholder="Search bookings, devotees..">
+                        <input type="search" placeholder="Search receiptss, devotees..">
                     </label>
 
                     <button type="button" class="icon-btn" aria-label="Notifications">

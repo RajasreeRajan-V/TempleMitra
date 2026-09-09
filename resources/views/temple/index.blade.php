@@ -252,6 +252,9 @@
     const ctx = document.getElementById('hundiTrendChart');
 
     if (ctx) {
+        const chartLabels = {!! json_encode($chartLabels ?? ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']) !!};
+        const chartValues = {!! json_encode($chartValues ?? [18500, 22400, 19800, 26700, 31200, 42500, 24850]) !!};
+
         // Colours pulled from the same oxide/brass palette used across
         // the sidebar and stat cards, so the chart doesn't feel bolted on.
         new Chart(ctx, {

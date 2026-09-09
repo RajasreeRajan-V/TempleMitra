@@ -13,13 +13,13 @@
             <span>Vazhipad</span>
         </a>
 
-        <a href="#" class="nav-link {{ request()->routeIs('bookings.*') ? 'nav-link--active' : '' }}">
+        <a href="#" class="nav-link {{ request()->routeIs('receiptss.*') ? 'nav-link--active' : '' }}">
             <span class="nav-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 2v4M16 2v4M9 14l2 2 4-4"/></svg>
             </span>
-            <span>Bookings</span>
-            @if($pendingBookingsCount ?? 12)
-                <span class="nav-badge">{{ $pendingBookingsCount ?? 12 }}</span>
+            <span>receiptss</span>
+            @if($pendingreceiptssCount ?? 12)
+                <span class="nav-badge">{{ $pendingreceiptssCount ?? 12 }}</span>
             @endif
         </a>
 
@@ -39,12 +39,37 @@
             <span>Prasadam</span>
         </a>
 
-        <a href="#" class="nav-link {{ request()->routeIs('reports.*') ? 'nav-link--active' : '' }}">
-            <span class="nav-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-4 4"/></svg>
-            </span>
-            <span>Reports</span>
-        </a>
+        {{-- ================= REPORTS DROPDOWN ================= --}}
+        <div class="nav-dropdown {{ request()->routeIs('reports.*') ? 'nav-dropdown--active is-open' : '' }}">
+            <button type="button" class="nav-dropdown-toggle" onclick="toggleNavDropdown(this)" aria-expanded="{{ request()->routeIs('reports.*') ? 'true' : 'false' }}">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-4 4"/></svg>
+                </span>
+                <span>Reports</span>
+                <span class="dropdown-arrow">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                </span>
+            </button>
+
+            <div class="nav-dropdown-menu {{ request()->routeIs('reports.*') ? 'is-open' : '' }}">
+            <a href="{{ route('reports.vazhipad') }}" class="nav-dropdown-item {{ request()->routeIs('reports.vazhipad') ? 'active' : '' }}">
+    <span>🪔</span><span>Vazhipad Report</span>
+</a>
+
+<a href="{{ route('reports.donation') }}" class="nav-dropdown-item {{ request()->routeIs('reports.donation') ? 'active' : '' }}">
+    <span>🙏</span><span>Donation Report</span>
+</a>
+
+<a href="{{ route('reports.collection') }}" class="nav-dropdown-item {{ request()->routeIs('reports.collection') ? 'active' : '' }}">
+    <span>💰</span><span>Collection Report</span>
+</a>
+
+<a href="{{ route('reports.devotees') }}" class="nav-dropdown-item {{ request()->routeIs('reports.devotees') ? 'active' : '' }}">
+    <span>👥</span><span>Devotee Report</span>
+</a>
+            </div>
+        </div>
+        {{-- =============== END REPORTS DROPDOWN =============== --}}
 
         <a href="#" class="nav-link {{ request()->routeIs('transactions.*') ? 'nav-link--active' : '' }}">
             <span class="nav-icon">
@@ -90,3 +115,15 @@
         </button>
     </form>
 </aside>
+
+@once
+<script>
+    function toggleNavDropdown(btn) {
+        const wrapper = btn.closest('.nav-dropdown');
+        const menu = wrapper.querySelector('.nav-dropdown-menu');
+        const isOpen = wrapper.classList.toggle('is-open');
+        menu.classList.toggle('is-open', isOpen);
+        btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    }
+</script>
+@endonce

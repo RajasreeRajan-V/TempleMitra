@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\VazhipadController;
 use App\Http\Controllers\Admin\receiptsController;
 use App\Http\Controllers\Temple\ReceiptPrintingController;
 use App\Http\Controllers\Temple\ReceiptReportController;
+use App\Http\Controllers\Temple\TempleDashboardController;
 
 
 /*
@@ -27,20 +28,27 @@ Route::get('/temple', function () {
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', [DashboardController::class, 'index'])
-    ->name('admin.dashboard');
+Route::prefix('temple')
+    ->name('temple.')
+    ->middleware(['temple.auth'])
+    ->group(function () {
 
+   
+        Route::get('/dashboard', [TempleDashboardController::class, 'index'])
+            ->name('dashboard');
+
+
+            Route::middleware('auth')->group(function () {
+                Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+                Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+                Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+            });
 
 /*
 |--------------------------------------------------------------------------
 | Temple Vazhipad & Receipts
 |--------------------------------------------------------------------------
 */
-
-Route::prefix('temple')
-    ->name('temple.')
-    ->group(function () {
-
         /*
         |--------------------------------------------------------------------------
         | Vazhipad CRUD
@@ -319,4 +327,6 @@ Route::middleware('auth')
 |--------------------------------------------------------------------------
 */
 
-require __DIR__ . '/auth.php';
+
+require __DIR__.'/auth.php';
+require __DIR__.'/admin.php';

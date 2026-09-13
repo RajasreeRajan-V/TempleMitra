@@ -51,8 +51,8 @@
                 <div class="stat-icon stat-icon--orange">📋</div>
                 <span class="stat-delta">▲ +5.2%</span>
             </div>
-            <div class="stat-value">{{ number_format($monthlyBookings ?? 3642) }}</div>
-            <div class="stat-label">Monthly Bookings</div>
+            <div class="stat-value">{{ number_format($monthlyreceiptss ?? 3642) }}</div>
+            <div class="stat-label">Monthly receiptss</div>
         </div>
 
         <div class="stat-card stat-card--green">

@@ -14,18 +14,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     public function up(): void
-    {
-        // 1) New pivot/line-item table
-        Schema::create('receipt_items', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('receipt_id')->constrained('receipts')->cascadeOnDelete();
-            $table->foreignId('vazhipad_id')->constrained('vazhipads')->cascadeOnDelete();
-            $table->unsignedInteger('quantity')->default(1);
-            $table->decimal('amount', 10, 2); // price for this line (quantity * unit price)
-            $table->timestamps();
-        });
-
-        // 2) Adjust receipts table: drop single vazhipad_id/amount, add total_amount
+    {     
         Schema::table('receipts', function (Blueprint $table) {
             if (Schema::hasColumn('receipts', 'vazhipad_id')) {
                 $table->dropConstrainedForeignId('vazhipad_id');
@@ -45,6 +34,5 @@ return new class extends Migration
             $table->renameColumn('total_amount', 'amount');
         });
 
-        Schema::dropIfExists('receipt_items');
     }
 };

@@ -7,16 +7,18 @@
             </svg>
         </button>
 
-        <a href="{{ route('temple') }}" class="sidebar-brand-link">
+        <a href="{{ route('temple.dashboard') }}" class="sidebar-brand-link">
             <div class="sidebar-emblem">ॐ</div>
-            <h1 class="sidebar-title">{{ config('app.name', 'TempleMitra') }}</h1>
+            <h1 class="sidebar-title">
+    {{ session('temple_name', 'Temple') }}
+</h1>
             <p class="sidebar-subtitle">VAZHIPAD MANAGEMENT</p>
         </a>
     </div>
 
     <nav class="sidebar-nav">
-        <a href="{{ route('temple') }}"
-           class="nav-link {{ request()->routeIs('temple') ? 'nav-link--active' : '' }}">
+        <a href="{{ route('temple.dashboard') }}"
+           class="nav-link {{ request()->routeIs('temple.dashboard') ? 'nav-link--active' : '' }}">
             <span class="nav-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>

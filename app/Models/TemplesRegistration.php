@@ -26,6 +26,5 @@ class TemplesRegistration extends Model
     ];
 
     protected $hidden = [
-        'password',
     ];
 }

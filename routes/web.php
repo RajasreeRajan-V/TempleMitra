@@ -9,7 +9,9 @@ use App\Http\Controllers\Admin\VazhipadController;
 use App\Http\Controllers\Admin\receiptsController;
 use App\Http\Controllers\Temple\ReceiptPrintingController;
 use App\Http\Controllers\Temple\ReceiptReportController;
-
+use App\Http\Controllers\Temple\TempleProfileController;
+use App\Http\Controllers\Temple\TempleLoginController;
+use App\Http\Controllers\Temple\TempleImageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,9 +19,6 @@ use App\Http\Controllers\Temple\ReceiptReportController;
 |--------------------------------------------------------------------------
 */
 
-Route::get('/temple', function () {
-    return view('temple.index');
-})->name('temple');
 
 
 /*
@@ -36,23 +35,21 @@ Route::prefix('temple')
         Route::get('/dashboard', [TempleDashboardController::class, 'index'])
             ->name('dashboard');
 
+            Route::get('/profile', [TempleProfileController::class, 'show'])->name('profile');
+            Route::get('/profile/edit', [TempleProfileController::class, 'edit'])->name('profile.edit');
+            Route::put('/profile', [TempleProfileController::class, 'update'])->name('profile.update');
+            
+            Route::get('/profile/password', [TempleProfileController::class, 'editPassword'])->name('password.edit');
+            Route::put('/profile/password', [TempleProfileController::class, 'updatePassword'])->name('password.update');
+            
+            Route::get('/change-password', [TempleLoginController::class, 'changePassword'])
+                ->name('password.change');
 
-            Route::middleware('auth')->group(function () {
-                Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-                Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-                Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-            });
-
-/*
-|--------------------------------------------------------------------------
-| Temple Vazhipad & Receipts
-|--------------------------------------------------------------------------
-*/
-
-Route::prefix('temple')
-    ->name('temple.')
-    ->group(function () {
-
+            Route::put('/change-password', [TempleLoginController::class, 'updatePassword'])
+                ->name('password.update');
+            
+            Route::post('/profile/images', [TempleImageController::class, 'update'])
+                ->name('images.update');
         /*
         |--------------------------------------------------------------------------
         | Vazhipad CRUD
@@ -272,11 +269,11 @@ Route::prefix('temple/reports')
 |--------------------------------------------------------------------------
 */
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+// Route::get('/dashboard', function () {
+//     return view('dashboard');
+// })
+//     ->middleware(['auth', 'verified'])
+//     ->name('dashboard');
 
 
 /*
@@ -331,6 +328,6 @@ Route::middleware('auth')
 |--------------------------------------------------------------------------
 */
 
- });
+
 require __DIR__.'/auth.php';
 require __DIR__.'/admin.php';

@@ -10,6 +10,7 @@ class TempleAuth
 {
     public function handle(Request $request, Closure $next): Response
     {
+
         if (!session('temple_logged_in')) {
             return redirect('/')
                 ->with('error', 'Please login first.');

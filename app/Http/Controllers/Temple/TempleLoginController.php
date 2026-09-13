@@ -21,65 +21,63 @@ class TempleLoginController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-  public function TempledoLogin(Request $request)
-{
-    $validator = Validator::make($request->all(), [
-        'email' => 'required|email',
-        'password' => 'required|min:6',
-    ]);
+    public function TempledoLogin(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'password' => 'required|min:6',
+        ]);
 
-    if ($validator->fails()) {
-        return redirect()->back()
-            ->with('error', 'Invalid email or password')
-            ->with('login_type', 'temple')
-            ->withInput();
-    }
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->with('error', 'Invalid email or password')
+                ->with('login_type', 'temple')
+                ->withInput();
+        }
 
-    // Find active temple
-    $temple = TemplesRegistration::where('email', $request->email)
-        ->where('status', 'active')
-        ->first();
+        $temple = TemplesRegistration::where('email', $request->email)
+            ->where('status', 'active')
+            ->first();
 
-    // Check whether temple exists
-    if (!$temple) {
-        return redirect()->back()
-            ->with('error', 'Invalid email or password')
-            ->with('login_type', 'temple')
-            ->withInput();
-    }
+        if (!$temple) {
+            return redirect()->back()
+                ->with('error', 'Invalid email or password')
+                ->with('login_type', 'temple')
+                ->withInput();
 
-    try {
+        }
 
-        // Decrypt password stored in database
-        $decryptedPassword = Crypt::decryptString($temple->password);
+        try {
+            // Decrypt the encrypted password
+            $decryptedPassword = Crypt::decryptString($temple->password);
 
-        // Compare entered password with decrypted password
-        if ($request->password !== $decryptedPassword) {
+            // Compare entered password
+            if (!hash_equals($decryptedPassword, $request->password)) {
+                return redirect()->back()
+                    ->with('error', 'Invalid email or password')
+                    ->with('login_type', 'temple')
+                    ->withInput();
+            }
+
+        } catch (\Exception $e) {
+
             return redirect()->back()
                 ->with('error', 'Invalid email or password')
                 ->with('login_type', 'temple')
                 ->withInput();
         }
 
-    } catch (\Exception $e) {
+        // Store temple session
+        session([
+            'temple_id' => $temple->id,
+            'temple_name' => $temple->temple_name,
+            'temple_email' => $temple->email,
+            'temple_logged_in' => true,
+        ]);
 
-        return redirect()->back()
-            ->with('error', 'Invalid email or password')
-            ->with('login_type', 'temple')
-            ->withInput();
+        return redirect()->route('temple.dashboard');
     }
-
-    // Store logged-in temple details in session
-    session([
-        'temple_id' => $temple->id,
-        'temple_name' => $temple->temple_name,
-        'temple_email' => $temple->email,
-        'temple_logged_in' => true,
-    ]);
-
-    // Redirect to temple dashboard
-    return redirect()->route('temple.dashboard');
-}
     public function create()
     {
         //
@@ -112,9 +110,75 @@ class TempleLoginController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    /**
+     * Show change password form
+     */
+    public function changePassword()
     {
-        //
+        return view('temple.change-password');
+    }
+
+    /**
+     * Update temple password
+     */
+    public function updatePassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'current_password' => 'required',
+            'password' => 'required|min:6|confirmed',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        // Get logged-in temple ID from session
+        $templeId = session('temple_id');
+
+        if (!$templeId || !session('temple_logged_in')) {
+            return redirect('/')
+                ->with('error', 'Please login first.');
+        }
+
+        $temple = TemplesRegistration::find($templeId);
+
+        if (!$temple) {
+            session()->flush();
+
+            return redirect('/')
+                ->with('error', 'Temple account not found.');
+        }
+
+        try {
+            // Decrypt existing password
+            $currentPassword = Crypt::decryptString($temple->password);
+
+            // Check current password
+            if (!hash_equals($currentPassword, $request->current_password)) {
+                return redirect()->back()
+                    ->withErrors([
+                        'current_password' => 'Current password is incorrect.'
+                    ])
+                    ->withInput();
+            }
+
+            // Encrypt and save new password
+            $temple->password = Crypt::encryptString($request->password);
+            $temple->save();
+
+            return redirect()
+                ->route('temple.password.change')
+                ->with('success', 'Password changed successfully.');
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withErrors([
+                    'current_password' => 'Unable to verify your current password.'
+                ])
+                ->withInput();
+        }
     }
 
     /**

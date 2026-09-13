@@ -1,3 +1,4 @@
+
 <aside class="sidebar" id="templeSidebar">
     <div class="sidebar-brand">
         <button type="button" class="sidebar-close-btn" id="sidebarClose" aria-label="Close sidebar">
@@ -47,9 +48,7 @@
                 </svg>
             </span>
             <span>receipts</span>
-            @if(isset($pendingreceiptssCount) || true)
-                <span class="nav-badge">{{ $pendingreceiptssCount ?? 12 }}</span>
-            @endif
+            
         </a>
 
         <a href="{{ route('temple.receipt-printing.index') }}" class="nav-link {{ request()->routeIs('temple.receipt-printing.*') ? 'nav-link--active' : '' }}">
@@ -107,7 +106,7 @@
         <a href="{{ route('temple.reports.index') }}"
            class="nav-dropdown-item {{ request()->routeIs('temple.reports.index') ? 'active' : '' }}">
 
-            <span>📊</span>
+            <span><i class="fa-solid fa-chart-column"></i></span>
             <span>Report Dashboard</span>
 
         </a>
@@ -117,18 +116,8 @@
         <a href="{{ route('temple.reports.receipts') }}"
            class="nav-dropdown-item {{ request()->routeIs('temple.reports.receipts') ? 'active' : '' }}">
 
-            <span>🧾</span>
+            <span><i class="fa-solid fa-receipt"></i></span>
             <span>Receipt Reports</span>
-
-        </a>
-
-
-        {{-- Collection Reports --}}
-        <a href="{{ route('temple.reports.collections') }}"
-           class="nav-dropdown-item {{ request()->routeIs('temple.reports.collections') ? 'active' : '' }}">
-
-            <span>💰</span>
-            <span>Collection Reports</span>
 
         </a>
 
@@ -137,27 +126,20 @@
         <a href="{{ route('temple.reports.vazhipads') }}"
            class="nav-dropdown-item {{ request()->routeIs('temple.reports.vazhipads') ? 'active' : '' }}">
 
-            <span>🛕</span>
+            <span><i class="fa-solid fa-place-of-worship"></i></span>
             <span>Vazhipad Reports</span>
 
         </a>
 
 
-        {{-- Devotee Reports --}}
-        <a href="{{ route('temple.reports.devotees') }}"
-           class="nav-dropdown-item {{ request()->routeIs('temple.reports.devotees') ? 'active' : '' }}">
-
-            <span>👤</span>
-            <span>Devotee Reports</span>
-
-        </a>
+      
 
 
         {{-- Daily Report --}}
         <a href="{{ route('temple.reports.daily') }}"
            class="nav-dropdown-item {{ request()->routeIs('temple.reports.daily') ? 'active' : '' }}">
 
-            <span>📅</span>
+            <span><i class="fa-solid fa-calendar-days"></i></span>
             <span>Daily Report</span>
 
         </a>
@@ -165,16 +147,7 @@
     </div>
 
 </div>
-        <a href="#" class="nav-link {{ request()->routeIs('transactions.*') ? 'nav-link--active' : '' }}">
-            <span class="nav-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M6 3h9l6 6v12H6z"/>
-                    <path d="M15 3v6h6M9 13h6M9 17h6"/>
-                </svg>
-            </span>
-            <span>Transactions</span>
-        </a>
-
+       
         <a href="#" class="nav-link {{ request()->routeIs('notifications.*') ? 'nav-link--active' : '' }}">
             <span class="nav-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -184,7 +157,7 @@
             </span>
             <span>Notifications</span>
             @if(isset($unreadNotificationsCount) || true)
-                <span class="nav-badge">{{ $unreadNotificationsCount ?? 5 }}</span>
+                <span class="nav-badge">{{ $unreadNotificationsCount ?? 0 }}</span>
             @endif
         </a>
 

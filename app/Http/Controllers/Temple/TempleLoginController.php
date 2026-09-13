@@ -21,65 +21,63 @@ class TempleLoginController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-  public function TempledoLogin(Request $request)
-{
-    $validator = Validator::make($request->all(), [
-        'email' => 'required|email',
-        'password' => 'required|min:6',
-    ]);
+    public function TempledoLogin(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'password' => 'required|min:6',
+        ]);
 
-    if ($validator->fails()) {
-        return redirect()->back()
-            ->with('error', 'Invalid email or password')
-            ->with('login_type', 'temple')
-            ->withInput();
-    }
-
-    // Find active temple
-    $temple = TemplesRegistration::where('email', $request->email)
-        ->where('status', 'active')
-        ->first();
-
-    // Check whether temple exists
-    if (!$temple) {
-        return redirect()->back()
-            ->with('error', 'Invalid email or password')
-            ->with('login_type', 'temple')
-            ->withInput();
-    }
-
-    try {
-
-        // Decrypt password stored in database
-        $decryptedPassword = Crypt::decryptString($temple->password);
-
-        // Compare entered password with decrypted password
-        if ($request->password !== $decryptedPassword) {
+        if ($validator->fails()) {
             return redirect()->back()
+                ->withErrors($validator)
                 ->with('error', 'Invalid email or password')
                 ->with('login_type', 'temple')
                 ->withInput();
         }
 
-    } catch (\Exception $e) {
+        $temple = TemplesRegistration::where('email', $request->email)
+            ->where('status', 'active')
+            ->first();
 
-        return redirect()->back()
-            ->with('error', 'Invalid email or password')
-            ->with('login_type', 'temple')
-            ->withInput();
+        if (!$temple) {
+            return redirect()->back()
+                ->with('error', 'Invalid email or password')
+                ->with('login_type', 'temple')
+                ->withInput();
+       
+                }
+
+        try {
+            // Decrypt the encrypted password
+            $decryptedPassword = Crypt::decryptString($temple->password);
+
+            // Compare entered password
+            if (!hash_equals($decryptedPassword, $request->password)) {
+                return redirect()->back()
+                    ->with('error', 'Invalid email or password')
+                    ->with('login_type', 'temple')
+                    ->withInput();
+            }
+
+        } catch (\Exception $e) {
+
+            return redirect()->back()
+                ->with('error', 'Invalid email or password')
+                ->with('login_type', 'temple')
+                ->withInput();
+        }
+ 
+        // Store temple session
+        session([
+            'temple_id' => $temple->id,
+            'temple_name' => $temple->temple_name,
+            'temple_email' => $temple->email,
+            'temple_logged_in' => true,
+        ]);
+        
+        return redirect()->route('temple.dashboard');
     }
-
-    // Store logged-in temple details in session
-    session([
-        'temple_id' => $temple->id,
-        'temple_name' => $temple->temple_name,
-        'temple_email' => $temple->email,
-        'temple_logged_in' => true,
-    ]);
-
-    // Redirect to temple dashboard
-    return redirect()->route('temple.dashboard');
-}
     public function create()
     {
         //

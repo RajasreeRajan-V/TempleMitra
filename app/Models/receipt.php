@@ -10,39 +10,59 @@ class Receipt extends Model
     use HasFactory;
 
     protected $fillable = [
+        'devotee_id',
+        'receipt_date',
+        'vazhipad_id',
         'devotee_name',
         'nakshatram',
         'receipts_date',
         'total_amount',
+        'payment_status',
+        'payment_method',
+        'paid_amount',
+        'paid_at',
+        'amount',
         'status',
     ];
 
     protected $casts = [
+        'receipt_date'  => 'date',
         'receipts_date' => 'date',
-        'total_amount' => 'decimal:2',
+        'total_amount'  => 'decimal:2',
+        'paid_amount'   => 'decimal:2',
+        'amount'        => 'decimal:2',
+        'paid_at'       => 'datetime',
     ];
+
+    public function devotee()
+    {
+        return $this->belongsTo(Devotee::class);
+    }
+
+    public function vazhipad()
+    {
+        return $this->belongsTo(Vazhipad::class);
+    }
 
     public function items()
     {
-        return $this->hasMany(
-            ReceiptItem::class,
-            'receipt_id'
-        );
+        return $this->hasMany(ReceiptItem::class);
     }
 
-    public function recalculateTotal()
+    public function scopeBetweenDates($query, $from, $to)
     {
-        $total = $this->items()
-            ->get()
-            ->sum(function ($item) {
-                return (float) $item->quantity *
-                       (float) $item->amount;
-            });
+        return $query->whereBetween('receipts_date', [$from, $to]);
+    }
 
-        $this->total_amount = $total;
-
+    /**
+     * Recalculate receipt total from receipt item line totals.
+     *
+     * receipt_items.amount already contains the line total,
+     * so quantity must NOT be multiplied again.
+     */
+    public function recalculateTotal(): void
+    {
+        $this->total_amount = $this->items()->sum('amount');
         $this->save();
-
-        return $this;
     }
 }

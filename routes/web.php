@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Temple\TempleDashboardController;
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -8,7 +9,6 @@ use App\Http\Controllers\Admin\VazhipadController;
 use App\Http\Controllers\Admin\receiptsController;
 use App\Http\Controllers\Temple\ReceiptPrintingController;
 use App\Http\Controllers\Temple\ReceiptReportController;
-use App\Http\Controllers\Temple\TempleDashboardController;
 
 
 /*
@@ -18,7 +18,7 @@ use App\Http\Controllers\Temple\TempleDashboardController;
 */
 
 Route::get('/temple', function () {
-    return view('temple.index');
+    return redirect()->route('temple.dashboard');
 })->name('temple');
 
 
@@ -33,7 +33,6 @@ Route::prefix('temple')
     ->middleware(['temple.auth'])
     ->group(function () {
 
-   
         Route::get('/dashboard', [TempleDashboardController::class, 'index'])
             ->name('dashboard');
 
@@ -44,11 +43,6 @@ Route::prefix('temple')
                 Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
             });
 
-/*
-|--------------------------------------------------------------------------
-| Temple Vazhipad & Receipts
-|--------------------------------------------------------------------------
-*/
         /*
         |--------------------------------------------------------------------------
         | Vazhipad CRUD
@@ -259,6 +253,32 @@ Route::prefix('temple/reports')
             '/collections',
             [ReceiptReportController::class, 'collections']
         )->name('collections');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Excel (CSV) Downloads
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/daily/excel',       [ReceiptReportController::class, 'dailyExcel'])->name('daily.excel');
+        Route::get('/receipts/excel',    [ReceiptReportController::class, 'receiptsExcel'])->name('receipts.excel');
+        Route::get('/collections/excel', [ReceiptReportController::class, 'collectionsExcel'])->name('collections.excel');
+        Route::get('/vazhipads/excel',   [ReceiptReportController::class, 'vazhipadsExcel'])->name('vazhipads.excel');
+        Route::get('/devotees/excel',    [ReceiptReportController::class, 'devoteesExcel'])->name('devotees.excel');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | PDF Print Views
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/daily/pdf',       [ReceiptReportController::class, 'dailyPdf'])->name('daily.pdf');
+        Route::get('/receipts/pdf',    [ReceiptReportController::class, 'receiptsPdf'])->name('receipts.pdf');
+        Route::get('/collections/pdf', [ReceiptReportController::class, 'collectionsPdf'])->name('collections.pdf');
+        Route::get('/vazhipads/pdf',   [ReceiptReportController::class, 'vazhipadsPdf'])->name('vazhipads.pdf');
+        Route::get('/devotees/pdf',    [ReceiptReportController::class, 'devoteesPdf'])->name('devotees.pdf');
     });
 
 

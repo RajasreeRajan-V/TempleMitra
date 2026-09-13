@@ -6,7 +6,6 @@
 
 <div class="receipt-page-container">
 
-```
 {{-- ================================================================
      FLASH NOTIFICATIONS
 ================================================================= --}}
@@ -128,6 +127,12 @@
 
 {{-- ================================================================
      SUMMARY CALCULATIONS
+     FIXED:
+       - total_amount (not amount) for the Dakshina Recorded stat
+       - payment_status (not status) for Confirmed/Pending stats,
+         since status is written once as 'pending' at creation and
+         never updated again — payment_status is what actually
+         changes via the Receipt Printing & Payments screen.
 ================================================================= --}}
 @php
 
@@ -144,30 +149,30 @@
 
     /*
     |--------------------------------------------------------------------------
-    | Current page amount
+    | Current page amount (FIXED: total_amount, not amount)
     |--------------------------------------------------------------------------
     */
 
     $totalAmountSum = $receiptss->sum(function ($receipt) {
-        return (float) ($receipt->amount ?? 0);
+        return (float) ($receipt->total_amount ?? 0);
     });
 
 
     /*
     |--------------------------------------------------------------------------
-    | Status counts
+    | Status counts (FIXED: payment_status, not status)
     |--------------------------------------------------------------------------
     */
 
     $confirmedCount = $receiptss->filter(function ($receipt) {
 
-        $status = strtolower(
-            $receipt->status ?? 'confirmed'
+        $paymentStatus = strtolower(
+            $receipt->payment_status ?? 'pending'
         );
 
         return in_array(
-            $status,
-            ['confirmed', 'completed']
+            $paymentStatus,
+            ['paid']
         );
 
     })->count();
@@ -175,9 +180,14 @@
 
     $pendingCount = $receiptss->filter(function ($receipt) {
 
-        return strtolower(
-            $receipt->status ?? ''
-        ) === 'pending';
+        $paymentStatus = strtolower(
+            $receipt->payment_status ?? 'pending'
+        );
+
+        return in_array(
+            $paymentStatus,
+            ['pending', 'partially_paid']
+        );
 
     })->count();
 
@@ -187,136 +197,6 @@
 {{-- ================================================================
      SUMMARY STATS
 ================================================================= --}}
-<div class="receipts-stats-grid">
-
-    {{-- Total Receipts --}}
-    <div class="vazhipad-stat-box">
-
-        <div class="vazhipad-stat-icon vazhipad-stat-icon--maroon">
-
-            <svg width="22" height="22" viewBox="0 0 24 24"
-                 fill="none" stroke="currentColor" stroke-width="1.8">
-
-                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-
-                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-
-            </svg>
-
-        </div>
-
-        <div class="vazhipad-stat-info">
-
-            <span class="vazhipad-stat-number">
-                {{ $totalReceiptsCount }}
-            </span>
-
-            <span class="vazhipad-stat-label">
-                Total Receipts
-            </span>
-
-        </div>
-
-    </div>
-
-
-    {{-- Total Amount --}}
-    <div class="vazhipad-stat-box">
-
-        <div class="vazhipad-stat-icon vazhipad-stat-icon--gold">
-
-            <svg width="22" height="22" viewBox="0 0 24 24"
-                 fill="none" stroke="currentColor" stroke-width="1.8">
-
-                <circle cx="12" cy="12" r="10"></circle>
-
-                <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path>
-
-                <path d="M12 18V6"></path>
-
-            </svg>
-
-        </div>
-
-        <div class="vazhipad-stat-info">
-
-            <span class="vazhipad-stat-number">
-                ₹{{ number_format($totalAmountSum, 2) }}
-            </span>
-
-            <span class="vazhipad-stat-label">  
-
-            
-                Dakshina Recorded
-            </span>
-
-        </div>
-
-    </div>
-
-
-    {{-- Confirmed --}}
-    <div class="vazhipad-stat-box">
-
-        <div class="vazhipad-stat-icon vazhipad-stat-icon--green">
-
-            <svg width="22" height="22" viewBox="0 0 24 24"
-                 fill="none" stroke="currentColor" stroke-width="1.8">
-
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-
-                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-
-            </svg>
-
-        </div>
-
-        <div class="vazhipad-stat-info">
-
-            <span class="vazhipad-stat-number">
-                {{ $confirmedCount }}
-            </span>
-
-            <span class="vazhipad-stat-label">
-                Confirmed / Completed
-            </span>
-
-        </div>
-
-    </div>
-
-
-    {{-- Pending --}}
-    <div class="vazhipad-stat-box">
-
-        <div class="vazhipad-stat-icon vazhipad-stat-icon--orange">
-
-            <svg width="22" height="22" viewBox="0 0 24 24"
-                 fill="none" stroke="currentColor" stroke-width="1.8">
-
-                <circle cx="12" cy="12" r="10"></circle>
-
-                <polyline points="12 6 12 12 14 14"></polyline>
-
-            </svg>
-
-        </div>
-
-        <div class="vazhipad-stat-info">
-
-            <span class="vazhipad-stat-number">
-                {{ $pendingCount }}
-            </span>
-
-            <span class="vazhipad-stat-label">
-                Pending Approval
-            </span>
-
-        </div>
-
-    </div>
-
-</div>
 
 
 {{-- ================================================================
@@ -361,24 +241,6 @@
             <span class="filter-count">
                 {{ $totalReceiptsCount }}
             </span>
-
-        </button>
-
-
-        <button type="button"
-                class="filter-pill"
-                data-filter="confirmed">
-
-            <span>Confirmed</span>
-
-        </button>
-
-
-        <button type="button"
-                class="filter-pill"
-                data-filter="pending">
-
-            <span>Pending</span>
 
         </button>
 
@@ -432,26 +294,60 @@
 
 
             <tbody id="receiptsTableBody">
-
-               @forelse($receiptss as $receipts)
+@forelse($receiptss as $receipts)
 
     @php
 
-        $status = strtolower(
-            $receipts->status ?? 'confirmed'
+        /*
+        |--------------------------------------------------------------------------
+        | PAYMENT STATUS
+        |--------------------------------------------------------------------------
+        */
+
+        $paymentStatus = strtolower(
+            $receipts->payment_status ?? 'pending'
         );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Convert database payment status to row filter status
+        |--------------------------------------------------------------------------
+        */
+
+        $status = $paymentStatus === 'paid'
+            ? 'confirmed'
+            : (
+                in_array($paymentStatus, ['pending', 'partially_paid'])
+                    ? 'pending'
+                    : $paymentStatus
+            );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | DEVOTEE
+        |--------------------------------------------------------------------------
+        */
 
         $devoteeName = $receipts->devotee_name
             ?? 'Walk-in Devotee';
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | NAKSHATRAM
+        |--------------------------------------------------------------------------
+        */
 
         $nakshatram = $receipts->nakshatram ?? null;
 
 
         /*
         |--------------------------------------------------------------------------
-        | Get all Vazhipad names from receipt_items
+        | VAZHIPAD NAMES
         |--------------------------------------------------------------------------
         */
+
         $vazhipadNames = $receipts->items
             ->filter(function ($item) {
                 return $item->vazhipad !== null;
@@ -464,21 +360,26 @@
 
         /*
         |--------------------------------------------------------------------------
-        | Search data
+        | SEARCH DATA
         |--------------------------------------------------------------------------
         */
+
         $searchHaystack = strtolower(
             ($receipts->id ?? '') . ' ' .
             ($receipts->receipt_no ?? '') . ' ' .
             ($devoteeName ?? '') . ' ' .
             ($nakshatram ?? '') . ' ' .
             ($vazhipadNames ?? '') . ' ' .
-            ($receipts->payment_mode ?? '') . ' ' .
+            ($receipts->payment_method ?? '') . ' ' .
             ($receipts->type ?? '')
         );
 
     @endphp
 
+
+    <tr class="receipt-row"
+        data-status="{{ $status }}"
+        data-search="{{ $searchHaystack }}">
 
     <tr class="receipt-row"
         data-status="{{ $status }}"
@@ -540,8 +441,7 @@
                              height="11"
                              viewBox="0 0 24 24"
                              fill="currentColor">
-
-                            <polygon points="
+                             <polygon points="
                                 12 2
                                 15.09 8.26
                                 22 9.27
@@ -717,29 +617,37 @@
         </td>
 
 
-        {{-- =================================================
-             TOTAL AMOUNT
-        ================================================== --}}
-        <td style="text-align: right;">
+       {{-- =================================================
+     TOTAL DAKSHINA
+================================================== --}}
 
-            <span class="amount-highlight">
+@php
 
-                <span style="
-                    color: var(--gold-600);
-                    font-size: 13px;
-                    font-weight: 600;
-                ">
-                    ₹
-                </span>
+    $receiptDakshinaAmount = $receipts->items
+        ? $receipts->items->sum(function ($item) {
+            return (float) ($item->amount ?? 0);
+        })
+        : 0;
 
-                {{ number_format(
-                    (float) ($receipts->total_amount ?? 0),
-                    2
-                ) }}
+@endphp
 
-            </span>
+<td style="text-align: right;">
 
-        </td>
+    <span class="amount-highlight">
+
+        <span style="
+            color: var(--gold-600);
+            font-size: 13px;
+            font-weight: 600;
+        ">
+            ₹
+        </span>
+
+        {{ number_format($receiptDakshinaAmount, 2) }}
+
+    </span>
+
+</td>
 
 
         {{-- =================================================
@@ -872,12 +780,11 @@
     </button>
 
 </div>
-```
 
 </div>
 
 {{-- ================================================================
-JAVASCRIPT
+     JAVASCRIPT
 ================================================================= --}}
 @push('scripts')
 
@@ -935,7 +842,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             /*
             |--------------------------------------------------------------------------
-            | Confirmed filter
+            | Confirmed filter (matches 'confirmed', derived from payment_status = paid)
             |--------------------------------------------------------------------------
             */
 
@@ -945,15 +852,15 @@ document.addEventListener('DOMContentLoaded', function () {
             if (currentFilter === 'confirmed') {
 
                 matchesFilter =
-                    status === 'confirmed' ||
-                    status === 'completed';
+                    status === 'confirmed';
 
             }
 
 
             /*
             |--------------------------------------------------------------------------
-            | Pending filter
+            | Pending filter (matches 'pending', derived from payment_status in
+            | pending/partially_paid)
             |--------------------------------------------------------------------------
             */
 

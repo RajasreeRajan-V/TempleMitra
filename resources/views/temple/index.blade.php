@@ -1,6 +1,6 @@
 @extends('temple.layouts.app')
 
-@section('title', 'Temple Dashboard')
+@section('title', 'Premium Dashboard')
 
 @section('content')
 
@@ -17,25 +17,18 @@
         </div>
         <div>
             <h1 class="page-title">
-                {{ $temple->name ?? 'Sree Temple' }} — Dashboard
+                {{ $temple->temple_name ?? 'Sree Temple' }} — Premium Dashboard
             </h1>
 
             <p class="page-subtitle">
                 Namaskaram, {{ Auth::user()->name ?? 'Priest/Staff' }}.
-                Here's today's temple activity summary.
+                Here's the overall temple activity summary.
             </p>
         </div>
     </div>
 
     <div class="page-header-actions">
-        <a href="#" class="btn btn-outline">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="2">
-                <path d="M12 3v12m0 0-4-4m4 4 4-4"/>
-                <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>
-            </svg>
-            Export Report
-        </a>
+      
 
         <a href="#" class="btn btn-primary">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -63,11 +56,11 @@
         </div>
 
         <div class="stat-value">
-            {{ $todaysVazhipad ?? 62 }}
+            {{ $totalVazhipad ?? 62 }}
         </div>
 
         <div class="stat-label">
-            Today's Vazhipad
+            Total Vazhipad
         </div>
     </div>
 
@@ -83,52 +76,11 @@
         </div>
 
         <div class="stat-value">
-            ₹{{ number_format($todaysHundi ?? 24850) }}
+            ₹{{ number_format($totalHundi ?? 24850) }}
         </div>
 
         <div class="stat-label">
-            Today's Hundi Collection
-        </div>
-    </div>
-
-
-    <div class="stat-card stat-card--orange">
-        <div class="stat-top">
-            <div class="stat-icon stat-icon--orange">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/>
-                    <circle cx="9" cy="7" r="4"/>
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
-                </svg>
-            </div>
-            <span class="stat-delta">▲ +3.4%</span>
-        </div>
-
-        <div class="stat-value">
-            {{ number_format($devoteeFootfall ?? 418) }}
-        </div>
-
-        <div class="stat-label">
-            Devotee Footfall Today
-        </div>
-    </div>
-
-
-    <div class="stat-card stat-card--green">
-        <div class="stat-top">
-            <div class="stat-icon stat-icon--green">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 3c-2 3-5 5-5 9a5 5 0 0 0 10 0c0-1.5-.6-2.5-1.3-3.5.1 1.4-.6 2-1.2 2 0-2-1-3-1.5-4.5-.3.9-.7 1.4-1 2z"/>
-                </svg>
-            </div>
-        </div>
-
-        <div class="stat-value">
-            {{ $poojasScheduled ?? 9 }}
-        </div>
-
-        <div class="stat-label">
-            Poojas Scheduled Today
+            Total Hundi Collection
         </div>
     </div>
 
@@ -138,22 +90,21 @@
 <!-- Second Statistics Row -->
 <div class="stat-grid">
 
-    <div class="stat-card">
+    <div class="stat-card stat-card--gold">
         <div class="stat-top">
-            <div class="stat-icon">
+            <div class="stat-icon stat-icon--gold">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="8" r="4"/>
-                    <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/>
+                    <path d="M12 21s-7-4.35-9.5-9.1C1 8.5 2.7 5 6.2 5c1.9 0 3.3 1 4.3 2.4C11.5 6 12.9 5 14.8 5 18.3 5 20 8.5 18.5 11.9 16 16.65 12 21 12 21Z"/>
                 </svg>
             </div>
         </div>
 
         <div class="stat-value">
-            {{ $staffOnDuty ?? 6 }}
+            ₹{{ number_format($totalDonations ?? 158400) }}
         </div>
 
         <div class="stat-label">
-            Staff / Priests On Duty
+            Total Donations
         </div>
     </div>
 
@@ -169,11 +120,11 @@
         </div>
 
         <div class="stat-value">
-            {{ number_format($prasadamOrders ?? 134) }}
+            {{ number_format($totalPrasadamOrders ?? 134) }}
         </div>
 
         <div class="stat-label">
-            Prasadam Orders Today
+            Total Prasadam Orders
         </div>
     </div>
 
@@ -195,25 +146,6 @@
 
         <div class="stat-label">
             Pending Approvals
-        </div>
-    </div>
-
-
-    <div class="stat-card stat-card--green">
-        <div class="stat-top">
-            <div class="stat-icon stat-icon--green">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="m12 3 2.5 5.5L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5z"/>
-                </svg>
-            </div>
-        </div>
-
-        <div class="stat-value">
-            {{ $upcomingFestivals ?? 2 }}
-        </div>
-
-        <div class="stat-label">
-            Upcoming Festivals (30d)
         </div>
     </div>
 

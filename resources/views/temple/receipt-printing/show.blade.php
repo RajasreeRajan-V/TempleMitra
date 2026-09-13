@@ -3,6 +3,323 @@
 @section('title', 'Receipt #' . ($receipt->receipt_number ?: str_pad($receipt->id, 6, '0', STR_PAD_LEFT)))
 
 @section('content')
+
+{{-- ============================================================
+     PRINT-ONLY STYLES
+     These rules only take effect when printing (window.print()).
+     On screen, nothing below changes — the print voucher stays hidden.
+     ============================================================ --}}
+<style>
+    .print-only-voucher {
+        display: none;
+    }
+
+    @media print {
+        /* Hide everything in the normal page ... */
+        body * {
+            visibility: hidden;
+        }
+
+        /* ... except the premium voucher block */
+        .print-only-voucher,
+        .print-only-voucher * {
+            visibility: visible;
+        }
+
+        .print-only-voucher {
+            display: block !important;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            background: #ffffff;
+        }
+
+        .no-print {
+            display: none !important;
+        }
+
+        .pv-wrapper {
+            width: 80mm;
+            max-width: 100%;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 1px solid var(--gold-500);
+            border-radius: 4px;
+            padding: 10px;
+            font-size: 11px;
+            color: #2d2118;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .pv-header {
+            text-align: center;
+            border-bottom: 1.5px double var(--line);
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+
+        .pv-invocation {
+            font-family: 'Noto Serif', Georgia, serif;
+            font-size: 9.5px;
+            letter-spacing: 0.08em;
+            color: var(--gold-600);
+            margin-bottom: 3px;
+            font-weight: 700;
+        }
+
+        .pv-temple-name {
+            font-family: 'Cormorant Garamond', 'Noto Serif', Georgia, serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--maroon-900);
+            margin: 2px 0 1px 0;
+            line-height: 1.2;
+        }
+
+        .pv-type-subtitle {
+            font-size: 8.5px;
+            font-weight: 600;
+            color: var(--ink-600);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .pv-meta-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10.5px;
+            margin-bottom: 4px;
+            color: var(--ink-800);
+        }
+
+        .pv-divider {
+            border-top: 1px dashed var(--line);
+            margin: 8px 0;
+        }
+
+        .pv-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10.5px;
+            margin-top: 4px;
+        }
+
+        .pv-table th {
+            text-align: left;
+            border-bottom: 1.25px solid var(--maroon-900);
+            padding: 4px 0;
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            color: #000000;
+        }
+
+        .pv-table td {
+            padding: 5px 0;
+            border-bottom: 1px dashed var(--line-light);
+            vertical-align: middle;
+        }
+
+        .pv-table th:last-child,
+        .pv-table td:last-child {
+            text-align: right;
+        }
+
+        .pv-table th:nth-child(2),
+        .pv-table td:nth-child(2) {
+            text-align: center;
+        }
+
+        .pv-total-banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            font-size: 12.5px;
+            margin-top: 8px;
+            border-top: 1.5px solid #000000;
+            padding-top: 7px;
+            color: #000000;
+        }
+
+        .pv-payment-box {
+            background: var(--cream-50);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            padding: 7px 9px;
+            margin-top: 9px;
+            font-size: 9.5px;
+        }
+
+        .pv-payment-box > div {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2px;
+        }
+
+        .pv-payment-box > div:last-child {
+            margin-bottom: 0;
+        }
+
+        .pv-blessing {
+            margin-top: 10px;
+            text-align: center;
+            font-family: 'Noto Serif', Georgia, serif;
+            font-size: 9px;
+            font-style: italic;
+            color: var(--ink-600);
+            line-height: 1.4;
+        }
+
+        .pv-sign-row {
+            margin-top: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            font-size: 8px;
+            color: var(--ink-600);
+        }
+
+        .pv-sign-row > div:last-child {
+            text-align: right;
+        }
+
+        .pv-sign-line {
+            border-top: 1px solid var(--ink-600);
+            width: 65px;
+            margin-bottom: 2px;
+            margin-left: auto;
+        }
+
+        html, body {
+            width: 80mm !important;
+        }
+    }
+
+    /* Small paper size — change 80mm to 58mm for 58mm thermal rolls.
+       Kept OUTSIDE @media print on purpose: @page rules only ever apply
+       during printing anyway, and placing it last / unscoped gives it
+       the strongest position in the cascade against any @page rule
+       declared earlier in temple.css (e.g. an A4 rule for other pages). */
+    @page {
+        size: 80mm auto !important;
+        margin: 2mm !important;
+    }
+</style>
+
+{{-- ============================================================
+     PRINT-ONLY VOUCHER MARKUP (same style/format as
+     receipt-voucher-premium.blade.php) — invisible on screen,
+     only rendered when the page is printed.
+     ============================================================ --}}
+<div class="print-only-voucher">
+    <div class="pv-wrapper">
+
+        <div class="pv-header">
+            <div class="pv-invocation">|| ഓം നമഃ ശിവായ || ശുഭം ഭവതു ||</div>
+            <h1 class="pv-temple-name">{{ config('app.temple_name', 'TempleMitra Devasthanam') }}</h1>
+            <div class="pv-type-subtitle">Vazhipad &amp; Pooja Dakshina Receipt</div>
+        </div>
+
+        <div class="pv-meta-row">
+            <span><strong>Receipt No:</strong></span>
+            <span style="font-family: monospace; font-weight: 700; color: var(--maroon-900);">
+                {{ $receipt->receipt_number ?: '#RC-' . str_pad($receipt->id, 6, '0', STR_PAD_LEFT) }}
+            </span>
+        </div>
+        <div class="pv-meta-row">
+            <span><strong>Date:</strong></span>
+            <span>{{ optional($receipt->receipt_date ?: $receipt->receipts_date)->format('d-m-Y') }}</span>
+        </div>
+
+        <div class="pv-divider"></div>
+
+        <div class="pv-meta-row">
+            <span><strong>Devotee:</strong></span>
+            <span style="font-family: 'Noto Serif', Georgia, serif; font-weight: 700; color: var(--maroon-900);">
+                {{ $receipt->devotee_name }}
+            </span>
+        </div>
+        <div class="pv-meta-row">
+            <span><strong>Nakshatram:</strong></span>
+            <span style="font-weight: 600; color: var(--gold-600);">
+                {{ $receipt->nakshatram }}
+            </span>
+        </div>
+
+        <div class="pv-divider"></div>
+
+        <table class="pv-table">
+            <thead>
+                <tr>
+                    <th style="width: 55%;">Vazhipad</th>
+                    <th style="width: 15%;">Qty</th>
+                    <th style="width: 30%;">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($receipt->items as $item)
+                    <tr>
+                        <td><strong>{{ $item->vazhipad->name ?? 'Offering' }}</strong></td>
+                        <td>{{ $item->quantity ?? 1 }}</td>
+                        <td>₹{{ number_format($item->amount, 2) }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+
+        <div class="pv-total-banner">
+            <span>TOTAL</span>
+            <span>₹{{ number_format($receipt->total_amount, 2) }}</span>
+        </div>
+
+        <div class="pv-payment-box">
+            <div>
+                <span><strong>Status:</strong></span>
+                <span style="text-transform: uppercase; font-weight: 700; color: var(--green-700);">
+                    {{ $receipt->payment_status_label ?: ($receipt->payment_status ?: 'Confirmed') }}
+                </span>
+            </div>
+            @if($receipt->payment_method)
+                <div>
+                    <span><strong>Method:</strong></span>
+                    <span>{{ strtoupper($receipt->payment_method) }}</span>
+                </div>
+            @endif
+            @if($receipt->transaction_id)
+                <div>
+                    <span><strong>Txn ID:</strong></span>
+                    <span style="font-family: monospace; font-weight: 600;">{{ $receipt->transaction_id }}</span>
+                </div>
+            @endif
+            @if($receipt->paid_amount)
+                <div>
+                    <span><strong>Paid:</strong></span>
+                    <span>₹{{ number_format($receipt->paid_amount, 2) }}</span>
+                </div>
+            @endif
+        </div>
+
+        <div class="pv-blessing">
+            "May the divine grace and blessings be upon you and your family."
+        </div>
+
+        <div class="pv-sign-row">
+            <div>
+                <small>{{ date('d/m/Y h:i A') }}</small>
+            </div>
+            <div>
+                <div class="pv-sign-line"></div>
+                <span>Counter Seal</span>
+            </div>
+        </div>
+
+    </div>
+</div>
+
 <div class="receipt-view-container">
 
     {{-- Top Action Toolbar --}}
@@ -17,24 +334,14 @@
 
         <div style="display: flex; align-items: center; gap: 10px;">
 
-        
-       
-      
-            
-
-        
-            <a href="{{ route('temple.receipt-printing.print', $receipt) }}"
-               class="btn-temple btn-temple-gold"
-               target="_blank">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <button onclick="window.print()" class="btn-temple btn-temple-primary btn-temple-sm">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="6 9 6 2 18 2 18 9"></polyline>
                     <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
                     <rect x="6" y="14" width="12" height="8"></rect>
                 </svg>
-                <span>Print Voucher</span>
-            </a>
-        
-            
+                <span>Print Voucher Slip</span>
+            </button>
 
             <a href="{{ route('temple.receipt-printing.payment.form', $receipt) }}"
                class="btn-temple btn-temple-primary">

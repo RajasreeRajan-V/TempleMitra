@@ -14,25 +14,31 @@ class ReceiptsController extends Controller
     /**
      * Display all receipts.
      */
-    public function index()
-    {
-        $receiptss = Receipt::with('items.vazhipad')
-            ->latest('receipts_date')
-            ->paginate(15);
+   public function index(Request $request)
+{
+    $receiptss = Receipt::with([
+        'items.vazhipad'
+    ])
+    ->latest('receipts_date')
+    ->paginate(15);
 
-        return view('temple.receipts.index', compact('receiptss'));
-    }
+    return view(
+        'temple.receipts.index',
+        compact('receiptss')
+    );
+}
 
     /**
      * Show create receipt form.
      */
-    public function create()
-    {
-        $vazhipads = Vazhipad::orderBy('name')->get();
+  public function create()
+{
+    $vazhipads = Vazhipad::where('status', 'active')
+        ->orderBy('name')
+        ->get();
 
-        return view('temple.receipts.create', compact('vazhipads'));
-    }
-
+    return view('temple.receipts.create', compact('vazhipads'));
+}
     /**
      * Store receipt and receipt items.
      */

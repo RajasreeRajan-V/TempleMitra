@@ -150,7 +150,7 @@
 
 </div>
        
-        <a href="#" class="nav-link {{ request()->routeIs('notifications.*') ? 'nav-link--active' : '' }}">
+        {{-- <a href="#" class="nav-link {{ request()->routeIs('notifications.*') ? 'nav-link--active' : '' }}">
             <span class="nav-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>
@@ -161,7 +161,7 @@
             @if(isset($unreadNotificationsCount) || true)
                 <span class="nav-badge">{{ $unreadNotificationsCount ?? 0 }}</span>
             @endif
-        </a>
+        </a> --}}
 
         <p class="nav-section-label">System</p>
 

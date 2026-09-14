@@ -115,7 +115,7 @@
     </a>
 </div>
         </div>
-        <a href="#" class="nav-link {{ request()->routeIs('reports.*') ? 'nav-link--active' : '' }}">
+        {{-- <a href="#" class="nav-link {{ request()->routeIs('reports.*') ? 'nav-link--active' : '' }}">
             <span class="nav-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                     <path d="M3 3v18h18" />
@@ -123,7 +123,7 @@
                 </svg>
             </span>
             <span>Reports</span>
-        </a>
+        </a> --}}
 
     </nav>
 

@@ -50,12 +50,7 @@
         </div>
     </div>
 
-    @php
-        $totalCount = ($receipts instanceof \Illuminate\Pagination\AbstractPaginator) ? $receipts->total() : $receipts->count();
-        $paidCount = $receipts->filter(fn($r) => ($r->payment_status ?? '') === 'paid')->count();
-        $pendingCount = $receipts->filter(fn($r) => in_array($r->payment_status ?? '', ['pending', 'partially_paid', '']))->count();
-        $totalCollected = $receipts->where('payment_status', 'paid')->sum('paid_amount') ?: $receipts->where('payment_status', 'paid')->sum('total_amount');
-    @endphp
+  
 
     {{-- Stats Summary Row --}}
     <div class="receipts-stats-grid">

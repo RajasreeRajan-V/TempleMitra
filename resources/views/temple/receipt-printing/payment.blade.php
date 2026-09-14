@@ -180,6 +180,7 @@
                                 'upi' => 'UPI (Google Pay / PhonePe / Paytm)',
                                 'card' => 'Debit / Credit Card POS',
                                 'bank_transfer' => 'Direct Bank Transfer / NEFT',
+                                'other' => 'Other',
                             ];
                         @endphp
                         @foreach ($methods as $value => $label)
@@ -188,6 +189,22 @@
                             </option>
                         @endforeach
                     </select>
+                </div>
+
+                <div class="form-group-item" style="margin-bottom: 18px; display: none;" id="transaction_id_group">
+                    <label class="form-label" for="transaction_id">
+                        <span>Transaction ID</span>
+                        <span style="color: var(--ink-400); font-weight: 400; font-size: 12px;">(optional)</span>
+                    </label>
+                    <input type="text"
+                           name="transaction_id"
+                           id="transaction_id"
+                           class="form-control"
+                           placeholder="e.g. UPI Ref / UTR / Txn No."
+                           value="{{ old('transaction_id', $receipt->transaction_id ?? '') }}">
+                    <span style="font-size: 12px; color: var(--ink-400); margin-top: 4px;">
+                        Enter the UPI reference number or transaction/UTR number, if available.
+                    </span>
                 </div>
 
                 <div class="form-group-item" style="margin-bottom: 18px;">
@@ -249,6 +266,19 @@
         const totalAmount = {{ (float) $receipt->total_amount }};
         const statusSelect = document.getElementById('payment_status');
         const paidAmountInput = document.getElementById('paid_amount');
+        const methodSelect = document.getElementById('payment_method');
+        const transactionIdGroup = document.getElementById('transaction_id_group');
+        const transactionIdInput = document.getElementById('transaction_id');
+
+        function toggleTransactionIdField() {
+            const methodsWithTxnId = ['upi', 'other'];
+            if (methodsWithTxnId.includes(methodSelect.value)) {
+                transactionIdGroup.style.display = '';
+            } else {
+                transactionIdGroup.style.display = 'none';
+                transactionIdInput.value = '';
+            }
+        }
 
         statusSelect?.addEventListener('change', function () {
             if (this.value === 'paid') {
@@ -263,6 +293,11 @@
                 this.value = totalAmount.toFixed(2);
             }
         });
+
+        methodSelect?.addEventListener('change', toggleTransactionIdField);
+
+        // Run on load so old()/existing value state is respected (e.g. validation errors, edit).
+        toggleTransactionIdField();
     })();
 </script>
 @endpush

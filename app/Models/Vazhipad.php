@@ -9,15 +9,24 @@ class Vazhipad extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'description', 'amount', 'is_active'];
+    protected $fillable = ['name', 'description', 'price', 'status'];
 
     protected $casts = [
-        'amount' => 'decimal:2',
-        'is_active' => 'boolean',
+        'price' => 'decimal:2',
     ];
 
     public function receipts()
     {
         return $this->hasMany(Receipt::class);
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'active');
+    }
+
+    public function getIsActiveAttribute(): bool
+    {
+        return $this->status === 'active';
     }
 }

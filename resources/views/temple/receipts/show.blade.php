@@ -153,22 +153,44 @@
                     @endforelse
 
                     {{-- Total Row --}}
-                    <tr class="receipt-total-row">
-                        <td colspan="2" style="font-family: 'Noto Serif', Georgia, serif; font-size: 16px; font-weight: 700; color: var(--maroon-900);">
-                            Total Dakshina Contribution
-                        </td>
-                        <td style="text-align: center; font-weight: 700; color: var(--ink-600);">
-                            {{ $receipt->items->sum('quantity') }} items
+                   <tr class="receipt-total-row">
+
+    <td colspan="2"
+        style="font-family: 'Noto Serif', Georgia, serif;
+               font-size: 16px;
+               font-weight: 700;
+               color: var(--maroon-900);">
+
+        Total Dakshina Contribution
+
+    </td>
 
 
+    <td style="text-align: center;
+               font-weight: 700;
+               color: var(--ink-600);">
 
-                        </td>
-                        <td style="text-align: right;">
-                            <span class="total-amount-display">
-                                <span style="font-size: 18px; color: var(--gold-600);">₹</span>{{ number_format($item->amount, 2) }}
-                            </span>
-                        </td>
-                    </tr>
+        {{ $receipt->items->sum('quantity') }} items
+
+    </td>
+
+
+    <td style="text-align: right;">
+
+        <span class="total-amount-display">
+
+            <span style="font-size: 18px;
+                         color: var(--gold-600);">
+                ₹
+            </span>
+
+            {{ number_format($receipt->items->sum('amount'), 2) }}
+
+        </span>
+
+    </td>
+
+</tr>
                 </tbody>
             </table>
 

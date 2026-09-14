@@ -9,11 +9,12 @@ use Illuminate\Http\Request;
 class VazhipadController extends Controller
 {
     public function index()
-{
-    $vazhipads = \App\Models\Vazhipad::latest()->get();
+    {
+        $vazhipads = Vazhipad::latest()->get();
 
-    return view('temple.vazhipad.index', compact('vazhipads'));
-}
+        return view('temple.vazhipad.index', compact('vazhipads'));
+    }
+
     public function create()
     {
         return view('temple.vazhipad.create');
@@ -21,12 +22,7 @@ class VazhipadController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'name'        => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price'       => 'required|numeric|min:0',
-            'status'      => 'required|in:active,inactive',
-        ]);
+        $validated = $this->validateRequest($request);
 
         Vazhipad::create($validated);
 
@@ -47,12 +43,7 @@ class VazhipadController extends Controller
 
     public function update(Request $request, Vazhipad $vazhipad)
     {
-        $validated = $request->validate([
-            'name'        => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price'       => 'required|numeric|min:0',
-            'status'      => 'required|in:active,inactive',
-        ]);
+        $validated = $this->validateRequest($request);
 
         $vazhipad->update($validated);
 
@@ -62,11 +53,22 @@ class VazhipadController extends Controller
     }
 
     public function destroy(Vazhipad $vazhipad)
-    {
-        $vazhipad->delete();
+{
+    $vazhipad->update([
+        'is_active' => false,
+        'status' => 'inactive',
+    ]);return redirect()
+    ->route('temple.vazhipad.index')
+    ->with('success', 'Vazhipad deactivated successfully.');
+}
 
-        return redirect()
-            ->route('temple.vazhipad.index')
-            ->with('success', 'Vazhipad deleted successfully.');
-    }
+private function validateRequest(Request $request): array
+{
+    return $request->validate([
+        'name'        => 'required|string|max:255',
+        'description' => 'nullable|string',
+        'price'       => 'required|numeric|min:0',
+        'status'      => 'required|in:active,inactive',
+    ]);
+}
 }

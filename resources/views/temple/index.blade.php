@@ -1,6 +1,6 @@
 @extends('temple.layouts.app')
 
-@section('title', 'Temple Dashboard')
+@section('title', 'Premium Dashboard')
 
 @section('content')
 
@@ -22,7 +22,7 @@
 
             <p class="page-subtitle">
                 Namaskaram, {{ Auth::user()->name ?? 'Priest/Staff' }}.
-                Here's today's temple activity summary.
+                Here's the overall temple activity summary.
             </p>
         </div>
     </div>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sign In · {{ config('app.name') }}</title>
+  <title>Admin Sign In · {{ config('app.name') }}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet" />
   <style>
@@ -47,13 +47,13 @@
       transition: box-shadow 0.2s;
     }
 
-    /* ---------- LEFT PANEL ---------- */
+    /* ---------- LEFT PANEL — ADMIN (darker, more "system") ---------- */
     .panel {
       position: relative;
       background:
-        radial-gradient(circle at 20% 20%, rgba(217, 185, 74, 0.18), transparent 45%),
-        radial-gradient(circle at 80% 85%, rgba(217, 185, 74, 0.12), transparent 40%),
-        linear-gradient(145deg, var(--maroon-950) 0%, var(--maroon-900) 60%, var(--maroon-800) 100%);
+        radial-gradient(circle at 20% 20%, rgba(217, 185, 74, 0.14), transparent 45%),
+        radial-gradient(circle at 80% 85%, rgba(217, 185, 74, 0.08), transparent 40%),
+        linear-gradient(145deg, #1a0508 0%, var(--maroon-950) 55%, var(--maroon-900) 100%);
       color: var(--gold-100);
       display: flex;
       flex-direction: column;
@@ -419,46 +419,46 @@
 
 <div class="stage">
 
-  <!-- LEFT PANEL — TEMPLE -->
+  <!-- LEFT PANEL — ADMIN -->
   <div class="panel">
     <div class="brand">
-      <div class="brand-mark">ॐ</div>
+      <div class="brand-mark">⚙</div>
       <div class="brand-text">
         <div class="name">{{ config('app.name', 'TempleMitra') }}</div>
-        <div class="tag">Vazhipad Management</div>
+        <div class="tag">System Administration</div>
       </div>
     </div>
 
     <div class="panel-body">
-      <div class="kicker">Temple administration</div>
-      <h1>Every offering,<br />recorded with care.</h1>
-      <p>Sign in to manage vazhipad receipts, devotee records, and daily prasadam — all in one place, kept as orderly as the sanctum itself.</p>
+      <div class="kicker">System administration</div>
+      <h1>One account,<br />full oversight.</h1>
+      <p>Sign in to manage staff access, temple settings, integrations, and reporting across every vazhipad center under your care.</p>
     </div>
 
     <div class="panel-stats">
       <div>
-        <div class="num">155</div>
-        <div class="label">Vazhipad today</div>
+        <div class="num">6</div>
+        <div class="label">Temples managed</div>
       </div>
       <div>
-        <div class="num">3,642</div>
-        <div class="label">Receipts this month</div>
+        <div class="num">42</div>
+        <div class="label">Staff accounts</div>
       </div>
       <div>
-        <div class="num">27</div>
-        <div class="label">Pending approvals</div>
+        <div class="num">99.9%</div>
+        <div class="label">System uptime</div>
       </div>
     </div>
   </div>
 
-  <!-- RIGHT FORM — TEMPLE -->
+  <!-- RIGHT FORM — ADMIN -->
   <div class="form-side">
     <div class="form-wrap">
-      <div class="eyebrow">Welcome back</div>
-      <h2>Sign in to your account</h2>
+      <div class="eyebrow">Administrator access</div>
+      <h2>Sign in to admin panel</h2>
 
       <div class="role-badge">
-        <span class="icon">ॐ</span> Temple Dashboard
+        <span class="icon">⚙</span> Admin Dashboard
       </div>
 
       @if (session('status'))
@@ -470,21 +470,21 @@
       @endif
 
       <div class="role-note">
-        Access vazhipad, devotees, prasadam and daily temple operations.
+        Access user roles, temple settings, integrations and system reports.
       </div>
 
-      {{-- Temple login form — dedicated route --}}
-      <form method="POST" action="{{ route('temple.login.store') }}" id="loginForm">
+      {{-- Admin login form — dedicated route --}}
+      <form method="POST" action="{{ route('login.store') }}" id="loginForm">
         @csrf
 
         <div class="field">
-          <label for="username">Username or email</label>
+          <label for="username">Admin username or email</label>
           <input
             type="text"
             id="username"
             name="email"
             value="{{ old('email') }}"
-            placeholder="anand@sreemahaganapathi.org"
+            placeholder="admin@sreemahaganapathi.org"
             autocomplete="email"
             required
             autofocus
@@ -519,13 +519,13 @@
           <a href="{{ route('password.request') ?? '#' }}">Forgot password?</a>
         </div>
 
-        <button type="submit" class="btn-signin">Sign in to Temple Dashboard</button>
+        <button type="submit" class="btn-signin">Sign in to Admin Dashboard</button>
       </form>
 
       <div class="divider">or</div>
 
       <p class="footer-note">
-        New to the temple office? <a href="#">Request access</a>
+        Need admin access? <a href="#">Contact IT support</a>
       </p>
     </div>
   </div>

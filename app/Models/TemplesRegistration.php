@@ -23,8 +23,11 @@ class TemplesRegistration extends Model
         'registration_number',
         'password',
         'status',
+        'one_month_notification_sent_at',
     ];
-
+protected $casts = [
+        'one_month_notification_sent_at' => 'datetime',
+    ];
     protected $hidden = [
     ];
 }

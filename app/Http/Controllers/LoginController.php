@@ -15,11 +15,15 @@ class LoginController extends Controller
     {
         return view('login');
     }
+    public function adminIndex()
+    {
+        return view('admin-login');
+    }
 
     /**
      * Show the form for creating a new resource.
      */
-     public function doLogin(Request $request)
+    public function doLogin(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
@@ -40,8 +44,8 @@ class LoginController extends Controller
             return redirect()->route('admin.dashboard');
         }
 
-        return redirect()->back()->with('error', 'Invalid email or password') ->with('login_type', 'admin')
-    ->withInput();
+        return redirect()->back()->with('error', 'Invalid email or password')->with('login_type', 'admin')
+            ->withInput();
     }
 
     public function create()
@@ -88,4 +92,13 @@ class LoginController extends Controller
     {
         //
     }
+     public function logout(Request $request)
+{
+    Auth::guard('admin')->logout();
+
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+
+    return redirect()->route('admin.login');
+}
 }

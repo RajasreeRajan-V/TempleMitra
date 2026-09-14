@@ -13,26 +13,36 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\Temple\TempleLoginController;
 use Illuminate\Support\Facades\Route;
 
-    Route::get('/', [LoginController::class, 'index'])
-        ->name('login');
+Route::get('/', [LoginController::class, 'index'])
+    ->name('login');
 
-    Route::post('login', [LoginController::class, 'doLogin'])
-        ->name('login.store');
+Route::get('admin/login', [LoginController::class, 'adminIndex'])
+    ->name('admin.login');
 
-    Route::post('temple/login', [TempleLoginController::class, 'TempledoLogin'])
-        ->name('temple.login.store');
+Route::post('login', [LoginController::class, 'doLogin'])
+    ->name('login.store');
 
-    Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
-        ->name('password.request');
+Route::post('temple/login', [TempleLoginController::class, 'TempledoLogin'])
+    ->name('temple.login.store');
 
-    Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
-        ->name('password.email');
+Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
+    ->name('password.request');
 
-    Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
-        ->name('password.reset');
+Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
+    ->name('password.email');
 
-    Route::post('reset-password', [NewPasswordController::class, 'store'])
-        ->name('password.store');
+Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
+    ->name('password.reset');
 
-    Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
-        ->name('logout');
+Route::post('reset-password', [NewPasswordController::class, 'store'])
+    ->name('password.store');
+
+Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
+    ->name('logout');
+
+Route::post('adminLogout', [LoginController::class, 'logout'])
+    ->name('admin.logout');
+
+Route::get('/subscription', function () {
+    return view('temple.subscription');
+})->name('temple.subscription');

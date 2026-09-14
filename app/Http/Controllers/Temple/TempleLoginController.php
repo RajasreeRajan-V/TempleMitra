@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\TemplesRegistration;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Crypt;
+use Carbon\Carbon;
+
 class TempleLoginController extends Controller
 {
     /**
@@ -36,6 +38,7 @@ class TempleLoginController extends Controller
                 ->withInput();
         }
 
+        // Find active temple
         $temple = TemplesRegistration::where('email', $request->email)
             ->where('status', 'active')
             ->first();
@@ -45,15 +48,22 @@ class TempleLoginController extends Controller
                 ->with('error', 'Invalid email or password')
                 ->with('login_type', 'temple')
                 ->withInput();
-
         }
 
+        /*
+        |--------------------------------------------------------------------------
+        | Check Password
+        |--------------------------------------------------------------------------
+        */
+
         try {
-            // Decrypt the encrypted password
+
+            // Decrypt stored password
             $decryptedPassword = Crypt::decryptString($temple->password);
 
-            // Compare entered password
+            // Compare password
             if (!hash_equals($decryptedPassword, $request->password)) {
+
                 return redirect()->back()
                     ->with('error', 'Invalid email or password')
                     ->with('login_type', 'temple')
@@ -68,16 +78,50 @@ class TempleLoginController extends Controller
                 ->withInput();
         }
 
-        // Store temple session
+
+        /*
+        |--------------------------------------------------------------------------
+        | Check One Month Expiry
+        |--------------------------------------------------------------------------
+        */
+
+        $registrationDate = Carbon::parse($temple->created_at);
+
+        $expiryDate = $registrationDate->copy()->addMonth();
+
+        if (Carbon::now()->greaterThanOrEqualTo($expiryDate)) {
+
+            // Store temple information temporarily in session
+            session([
+                'temple_id' => $temple->id,
+                'temple_name' => $temple->temple_name,
+                'temple_email' => $temple->email,
+                'temple_logged_in' => true,
+                'temple_expired' => true,
+            ]);
+
+            // Redirect to payment page
+            return redirect()->route('temple.subscription');
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Normal Temple Login
+        |--------------------------------------------------------------------------
+        */
+
         session([
             'temple_id' => $temple->id,
             'temple_name' => $temple->temple_name,
             'temple_email' => $temple->email,
             'temple_logged_in' => true,
+            'temple_expired' => false,
         ]);
 
         return redirect()->route('temple.dashboard');
     }
+
     public function create()
     {
         //

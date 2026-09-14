@@ -17,6 +17,22 @@ return Application::configure(basePath: dirname(__DIR__))
             'temple.auth' => TempleAuth::class,
         ]);
     })
+    ->withMiddleware(function (Middleware $middleware): void {
+
+        $middleware->redirectGuestsTo(function ($request) {
+
+            if ($request->is('admin/*')) {
+                return route('admin.login');
+            }
+
+            if ($request->is('temple/*')) {
+                return route('temple.login');
+            }
+
+            return route('login');
+        });
+
+    })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),

@@ -502,6 +502,13 @@
                     </div>
 
                     <div style="background: var(--cream-50); border: 1px solid var(--line); border-radius: var(--radius-md); padding: 14px 16px;">
+                        <div class="meta-field-label">Transaction ID</div>
+                        <div style="font-weight: 700; font-size: 14px; font-family: monospace; color: var(--ink-900); margin-top: 4px;">
+                            {{ $receipt->transaction_id ?: '—' }}
+                        </div>
+                    </div>
+
+                    <div style="background: var(--cream-50); border: 1px solid var(--line); border-radius: var(--radius-md); padding: 14px 16px;">
                         <div class="meta-field-label">Paid Amount</div>
                         <div style="font-weight: 700; font-size: 15px; color: var(--green-700); margin-top: 4px;">
                             ₹{{ number_format($receipt->paid_amount ?: $receipt->total_amount, 2) }}

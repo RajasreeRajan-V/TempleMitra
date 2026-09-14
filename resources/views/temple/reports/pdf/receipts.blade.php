@@ -4,15 +4,56 @@
 <meta charset="UTF-8">
 <title>Receipts Report — {{ $from }} to {{ $to }}</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 12px; color: #1a1a1a; padding: 24px; }
-  .header { text-align: center; border-bottom: 2px solid #7c1f2c; padding-bottom: 12px; margin-bottom: 20px; }
-  .header h1 { font-size: 20px; color: #7c1f2c; }
-  .header p  { font-size: 12px; color: #555; margin-top: 4px; }
-  .summary   { display: flex; gap: 16px; margin-bottom: 20px; }
-  .stat-box  { flex: 1; border: 1px solid #e2c97e; border-radius: 6px; padding: 12px; text-align: center; background: #fffdf5; }
-  .stat-box .label { font-size: 10px; color: #7c5c20; text-transform: uppercase; letter-spacing: .05em; }
-  .stat-box .value { font-size: 18px; font-weight: 700; color: #7c1f2c; margin-top: 4px; }
+  * { 
+    box-sizing: border-box;
+     margin: 0; padding: 0;
+     }
+  body {
+     font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 12px; 
+      color: #1a1a1a;
+       padding: 24px;
+       }
+  .header {
+     text-align: center;
+      border-bottom: 2px solid #7c1f2c;
+       padding-bottom: 12px;
+        margin-bottom: 20px;
+       }
+  .header h1 { 
+    font-size: 20px; 
+    color: #7c1f2c; 
+  }
+  .header p  {
+     font-size: 12px;
+      color: #555;
+       margin-top: 4px;
+       }
+  .summary   { 
+    display: flex;
+     gap: 16px;
+      margin-bottom: 20px;
+     }
+  .stat-box  { 
+    flex: 1;
+     border: 1px solid #e2c97e;
+      border-radius: 6px;
+       padding: 12px;
+        text-align: center;
+         background: #fffdf5;
+         }
+  .stat-box .label {
+     font-size: 10px;
+      color: #7c5c20;
+       text-transform: uppercase;
+        letter-spacing: .05em;
+       }
+  .stat-box .value {
+     font-size: 18px;
+      font-weight: 700;
+       color: #7c1f2c;
+        margin-top: 4px;
+       }
   table { width: 100%; border-collapse: collapse; }
   th    { background: #7c1f2c; color: #fff; padding: 8px 10px; text-align: left; font-size: 11px; }
   td    { padding: 7px 10px; border-bottom: 1px solid #eee; }

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Http\Controllers\Temple;
 
 use App\Http\Controllers\Controller;
@@ -16,23 +15,207 @@ use Illuminate\Support\Facades\DB;
 class ReceiptReportController extends Controller
 {
     public function index(Request $request): View
-    {
-        [$from, $to] = $this->resolveDateRange($request);
+{
+    /*
+    |--------------------------------------------------------------------------
+    | Date Range
+    |--------------------------------------------------------------------------
+    */
 
-        $totals = [
-            'receipts'         => Receipt::betweenDates($from, $to)->sum('total_amount'),
-            'receipts_count'   => Receipt::betweenDates($from, $to)->count(),
-            'collections'      => TempleCollection::whereDate('collection_date', '>=', $from)
-                                    ->whereDate('collection_date', '<=', $to)
-                                    ->sum('amount'),
-            'vazhipad_receipts' => Receipt::betweenDates($from, $to)
-                                    ->whereHas('items')
-                                    ->sum('total_amount'),
-            'devotees_count'   => Devotee::count(),
-        ];
+    [$from, $to] = $this->resolveDateRange($request);
 
-        return view('temple.reports.index', compact('totals', 'from', 'to'));
-    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Base Receipt Query
+    |--------------------------------------------------------------------------
+    |
+    | Use the same date range for all receipt statistics.
+    |
+    */
+
+    $receiptQuery = Receipt::query()
+        ->whereDate('receipts_date', '>=', $from)
+        ->whereDate('receipts_date', '<=', $to);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | TOTAL RECEIPTS
+    |--------------------------------------------------------------------------
+    */
+
+    $totalReceipts = (clone $receiptQuery)->count();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | TOTAL RECEIPTS AMOUNT
+    |--------------------------------------------------------------------------
+    |
+    | This is the total value of all receipts.
+    |
+    */
+
+    $totalReceiptAmount = (float) (clone $receiptQuery)
+        ->sum('total_amount');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | PAID RECEIPTS
+    |--------------------------------------------------------------------------
+    */
+
+    $paidQuery = (clone $receiptQuery)
+        ->where('payment_status', 'paid');
+
+
+    $paidCount = (clone $paidQuery)->count();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | TOTAL PAID AMOUNT
+    |--------------------------------------------------------------------------
+    |
+    | Only the actual amount received is counted.
+    |
+    */
+
+    $paidAmount = (float) (clone $paidQuery)
+        ->sum('paid_amount');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | PENDING + PARTIALLY PAID
+    |--------------------------------------------------------------------------
+    |
+    | Both statuses are considered pending.
+    |
+    */
+
+    $pendingStatuses = [
+        'pending',
+        'partially_paid',
+    ];
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | PENDING RECEIPTS COUNT
+    |--------------------------------------------------------------------------
+    */
+
+    $pendingCount = (clone $receiptQuery)
+        ->whereIn('payment_status', $pendingStatuses)
+        ->count();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | PENDING TOTAL AMOUNT
+    |--------------------------------------------------------------------------
+    |
+    | pending:
+    |     total_amount - paid_amount
+    |
+    | partially_paid:
+    |     total_amount - paid_amount
+    |
+    | Example:
+    |
+    | total_amount = 1000
+    | paid_amount  = 400
+    | pending      = 600
+    |
+    */
+
+    $pendingTotalDue = (float) (clone $receiptQuery)
+        ->whereIn('payment_status', $pendingStatuses)
+        ->sum('total_amount');
+
+
+    $pendingAlreadyPaid = (float) (clone $receiptQuery)
+        ->whereIn('payment_status', $pendingStatuses)
+        ->sum('paid_amount');
+
+
+    $totalPending = max(
+        0,
+        $pendingTotalDue - $pendingAlreadyPaid
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | OTHER REPORT TOTALS
+    |--------------------------------------------------------------------------
+    */
+
+    $collectionsAmount = (float) TempleCollection::query()
+        ->whereDate('collection_date', '>=', $from)
+        ->whereDate('collection_date', '<=', $to)
+        ->sum('amount');
+
+
+    $vazhipadReceiptAmount = (float) (clone $receiptQuery)
+        ->whereHas('items')
+        ->sum('total_amount');
+
+
+    $devoteesCount = Devotee::count();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | TOTALS ARRAY
+    |--------------------------------------------------------------------------
+    |
+    | Keep the existing $totals variable because your Blade uses it.
+    |
+    */
+
+    $totals = [
+        'receipts'          => $totalReceiptAmount,
+        'receipts_count'    => $totalReceipts,
+
+        'paid_amount'       => $paidAmount,
+        'paid_count'        => $paidCount,
+
+        'pending_amount'    => $totalPending,
+        'pending_count'     => $pendingCount,
+
+        'collections'       => $collectionsAmount,
+
+        'vazhipad_receipts' => $vazhipadReceiptAmount,
+
+        'devotees_count'    => $devoteesCount,
+
+        'vazhipad_count'    => (int) (clone $receiptQuery)
+            ->whereHas('items')
+            ->count(),
+    ];
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Return Report
+    |--------------------------------------------------------------------------
+    */
+
+    return view(
+        'temple.reports.index',
+        compact(
+            'totals',
+            'from',
+            'to',
+            'pendingCount',
+            'totalPending'
+        )
+    );
+}
 
 
     public function receipts(Request $request): View
@@ -344,10 +527,18 @@ class ReceiptReportController extends Controller
     public function receiptsPdf(Request $request): View
     {
         [$from, $to] = $this->resolveDateRange($request);
-        $receipts = Receipt::with(['items.vazhipad'])
-            ->betweenDates($from, $to)
-            ->orderByDesc('receipt_date')
-            ->get();
+
+        $query = Receipt::with(['items.vazhipad'])->betweenDates($from, $to);
+
+        if ($s = $request->input('payment_status')) {
+            $query->where('payment_status', $s);
+        }
+
+        if ($m = $request->input('payment_method')) {
+            $query->where('payment_method', $m);
+        }
+
+        $receipts = $query->orderByDesc('receipt_date')->get();
 
         return view('temple.reports.pdf.receipts', compact('receipts', 'from', 'to'));
     }

@@ -50,16 +50,28 @@
 {{-- Summary Cards --}}
 <div class="report-index-stat-grid">
 
+    {{--
+        "Total Receipts Amount" now reflects PAID amounts only.
+        Expects the controller to pass $totals['paid_amount'] and $totals['paid_count'],
+        e.g.:
+            Receipt::whereBetween('created_at', [$from, $to])
+                ->where('payment_status', 'paid') // or ->whereNotNull('paid_amount')
+                ->selectRaw('SUM(paid_amount) as paid_amount, COUNT(*) as paid_count')
+                ->first();
+        Falls back to the old $totals['receipts'] / $totals['receipts_count'] keys
+        if paid-specific keys aren't present yet, so this doesn't break before the
+        controller is updated.
+    --}}
     <a href="{{ route('temple.reports.receipts', ['from_date' => $from, 'to_date' => $to]) }}" class="report-index-stat-card">
         <div class="stat-card" style="border:none;box-shadow:none;">
             <div class="stat-top">
                 <div class="stat-icon">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="13" y2="15"/></svg>
                 </div>
-                <span class="stat-delta">{{ $totals['receipts_count'] }} receipts</span>
+                <span class="stat-delta">{{ $totals['paid_count'] ?? $totals['receipts_count'] }} paid</span>
             </div>
-            <div class="stat-value">₹{{ number_format($totals['receipts'], 2) }}</div>
-            <div class="stat-label">Total Receipts Amount</div>
+            <div class="stat-value">₹{{ number_format($totals['paid_amount'] ?? $totals['receipts'], 2) }}</div>
+            <div class="stat-label">Total Paid Amount</div>
         </div>
     </a>
 
@@ -77,18 +89,32 @@
         </div>
     </a>
 
-    <div class="report-index-stat-card">
-        <div class="stat-card stat-card--red">
-            <div class="stat-top">
-                <div class="stat-icon stat-icon--red">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                </div>
-                <span class="stat-delta">{{ $totals['pending_count'] ?? 0 }} pending</span>
+<div class="report-index-stat-card">
+    <div class="stat-card stat-card--red">
+        <div class="stat-top">
+            <div class="stat-icon stat-icon--red">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="1.8">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
             </div>
-            <div class="stat-value">₹{{ number_format($totals['pending_amount'] ?? 0, 2) }}</div>
-            <div class="stat-label">Pending Payments</div>
+
+            <span class="stat-delta">
+                {{ $pendingCount ?? 0 }} pending
+            </span>
+        </div>
+
+        <div class="stat-value">
+            ₹{{ number_format($totalPending ?? 0, 2) }}
+        </div>
+
+        <div class="stat-label">
+            Pending Payments
         </div>
     </div>
+</div>
 
 </div>
 
@@ -168,7 +194,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const trendLabels = @json(collect($trend ?? [])->keys());
     const trendValues = @json(collect($trend ?? [])->values());
 
-    const totalReceipts = {{ (float) ($totals['receipts'] ?? 0) }};
+    // "Received" side of the donut now mirrors the same paid-amount figure
+    // shown on the "Total Paid Amount" stat card above.
+    const totalReceipts = {{ (float) ($totals['paid_amount'] ?? $totals['receipts'] ?? 0) }};
     const totalPending  = {{ (float) ($totals['pending_amount'] ?? 0) }};
 
     // ---- Collection Trend (Line Chart) — driven by temple receipt amount ----

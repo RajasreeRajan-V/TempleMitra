@@ -19,6 +19,7 @@ class Receipt extends Model
         'total_amount',
         'payment_status',
         'payment_method',
+        'transaction_id', // ADD THIS
         'paid_amount',
         'paid_at',
         'amount',
@@ -54,12 +55,6 @@ class Receipt extends Model
         return $query->whereBetween('receipts_date', [$from, $to]);
     }
 
-    /**
-     * Recalculate receipt total from receipt item line totals.
-     *
-     * receipt_items.amount already contains the line total,
-     * so quantity must NOT be multiplied again.
-     */
     public function recalculateTotal(): void
     {
         $this->total_amount = $this->items()->sum('amount');

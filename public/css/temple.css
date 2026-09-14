@@ -3294,3 +3294,344 @@ body {
         padding: 14px 14px !important;
     }
 }
+
+/* ==========================================================================
+   PRINT VOUCHER — Premium Temple Receipt Clip Style
+   Page: A4  |  Clip margin: 8mm  |  Style: Premium Maroon & Gold
+   ========================================================================== */
+
+/* ---- Screen Toolbar ---- */
+.print-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    margin-bottom: 24px;
+    background: var(--cream-50);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+/* ---- Voucher Wrapper (screen preview) ---- */
+.print-voucher-wrapper {
+    width: 190mm;         /* A4 usable width minus 8mm clip each side */
+    max-width: 100%;
+    margin: 0 auto;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    padding: 22px 26px 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Gold accent stripe at top */
+.print-voucher-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, var(--maroon-900), var(--gold-500), var(--maroon-900));
+}
+
+/* ---- Header ---- */
+.voucher-header {
+    text-align: center;
+    padding: 10px 0 8px;
+}
+
+.voucher-invocation {
+    font-family: 'Cormorant Garamond', 'Noto Serif', Georgia, serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--maroon-700);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+
+.voucher-temple-name {
+    font-family: 'Cormorant Garamond', 'Noto Serif', Georgia, serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--maroon-900);
+    margin: 0 0 4px;
+    line-height: 1.2;
+    letter-spacing: 0.01em;
+}
+
+.voucher-type-subtitle {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--gold-600);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+/* ---- Divider ---- */
+.voucher-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-400), transparent);
+    margin: 10px 0;
+}
+
+/* ---- Meta Rows ---- */
+.voucher-meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;
+    font-size: 11.5px;
+    color: var(--ink-800);
+    border-bottom: 1px dashed var(--line-light);
+}
+.voucher-meta-row:last-of-type {
+    border-bottom: none;
+}
+
+/* ---- Offerings Table ---- */
+.voucher-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+    font-size: 11px;
+}
+
+.voucher-table thead tr {
+    background: linear-gradient(135deg, var(--maroon-900) 0%, var(--maroon-700) 100%);
+    color: #fff;
+}
+
+.voucher-table th {
+    padding: 7px 10px;
+    text-align: left;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.voucher-table tbody tr {
+    border-bottom: 1px solid var(--line-light);
+}
+
+.voucher-table tbody tr:nth-child(even) {
+    background: var(--gold-50);
+}
+
+.voucher-table td {
+    padding: 6px 10px;
+    color: var(--ink-800);
+    font-size: 11px;
+}
+
+/* ---- Total Banner ---- */
+.voucher-total-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, var(--maroon-900), var(--maroon-700));
+    color: #fff;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    font-weight: 800;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    margin: 8px 0;
+}
+
+.voucher-total-banner span:last-child {
+    font-family: 'Cormorant Garamond', 'Noto Serif', Georgia, serif;
+    font-size: 15px;
+    color: var(--gold-300);
+}
+
+/* ---- Payment Info Box ---- */
+.voucher-payment-box {
+    background: var(--gold-50);
+    border: 1px solid var(--gold-300);
+    border-radius: var(--radius-sm);
+    padding: 8px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 11px;
+    margin: 8px 0;
+}
+
+.voucher-payment-box div {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* ---- Blessing ---- */
+.voucher-blessing {
+    text-align: center;
+    font-family: 'Cormorant Garamond', 'Noto Serif', Georgia, serif;
+    font-size: 10.5px;
+    font-style: italic;
+    color: var(--ink-600);
+    padding: 10px 0 6px;
+}
+
+/* ---- Sign Row ---- */
+.voucher-sign-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 12px;
+    padding-top: 8px;
+    border-top: 1px solid var(--line-light);
+    font-size: 10px;
+    color: var(--ink-600);
+}
+
+.sign-line {
+    width: 80px;
+    height: 1px;
+    background: var(--ink-800);
+    margin-bottom: 4px;
+}
+
+.voucher-sign-row div {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+/* ==========================================================================
+   @media print — A4 page, 8mm clip margin, premium clean output
+   ========================================================================== */
+@media print {
+    /* A4 page size with 8mm clip margin all around */
+    @page {
+        size: A4 portrait;
+        margin: 8mm;
+    }
+
+    /* Hide non-print elements */
+    .no-print,
+    .print-toolbar {
+        display: none !important;
+    }
+
+    /* Reset body for clean print */
+    body {
+        background: #fff !important;
+        color: #000 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        font-family: 'Poppins', Arial, sans-serif;
+        font-size: 11pt;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    /* Voucher wrapper fills full A4 (minus @page margin) */
+    .print-voucher-wrapper {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 6mm 8mm !important;
+        border: none !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        background: #fff !important;
+        page-break-inside: avoid;
+    }
+
+    /* Keep decorative top stripe visible in print */
+    .print-voucher-wrapper::before {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    /* Header */
+    .voucher-temple-name {
+        font-size: 18pt !important;
+    }
+
+    .voucher-invocation {
+        font-size: 9pt !important;
+    }
+
+    .voucher-type-subtitle {
+        font-size: 8pt !important;
+    }
+
+    /* Meta rows */
+    .voucher-meta-row {
+        font-size: 9.5pt !important;
+        padding: 4px 0 !important;
+    }
+
+    /* Table */
+    .voucher-table {
+        font-size: 9pt !important;
+    }
+
+    .voucher-table th {
+        font-size: 8pt !important;
+        padding: 5px 8px !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .voucher-table thead tr {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .voucher-table td {
+        padding: 5px 8px !important;
+        font-size: 9pt !important;
+    }
+
+    .voucher-table tbody tr:nth-child(even) {
+        background: #fdf8e9 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    /* Total banner */
+    .voucher-total-banner {
+        font-size: 11pt !important;
+        padding: 8px 12px !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .voucher-total-banner span:last-child {
+        font-size: 13pt !important;
+    }
+
+    /* Payment box */
+    .voucher-payment-box {
+        font-size: 9pt !important;
+        padding: 6px 12px !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    /* Blessing */
+    .voucher-blessing {
+        font-size: 8.5pt !important;
+    }
+
+    /* Sign row */
+    .voucher-sign-row {
+        font-size: 8pt !important;
+    }
+
+    /* Avoid breaks inside key sections */
+    .voucher-header,
+    .voucher-meta-row,
+    .voucher-table,
+    .voucher-total-banner,
+    .voucher-payment-box,
+    .voucher-sign-row {
+        page-break-inside: avoid;
+    }
+}

@@ -5,32 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Receipt Voucher — {{ $receipt->receipt_number ?: $receipt->id }}</title>
 
+    {{-- Premium fonts: Cormorant Garamond for temple headings, Poppins for body --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Noto+Serif:wght@600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Noto+Serif:wght@600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    {{-- All styles (screen + @media print A4/8mm clip) live in temple.css --}}
     <link rel="stylesheet" href="{{ asset('css/temple.css') }}">
 
     <style>
-        * {
-            box-sizing: border-box;
-        }
-
+        /* Screen-only body background */
         body {
-            font-family: 'Poppins', sans-serif;
-            color: #2d2118;
-            margin: 0;
-            padding: 24px 12px;
             background: #ede4d3;
+            padding: 24px 12px;
+            margin: 0;
         }
-
-       
     </style>
 </head>
 <body>
 
+    {{-- ── Toolbar (hidden when printing) ── --}}
     <div class="print-toolbar no-print">
-        <a href="{{ route('temple.receipt-printing.show', $receipt) }}" class="btn-temple btn-temple-secondary btn-temple-sm">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <a href="{{ route('temple.receipt-printing.show', $receipt) }}"
+           class="btn-temple btn-temple-secondary btn-temple-sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <line x1="19" y1="12" x2="5" y2="12"></line>
                 <polyline points="12 19 5 12 12 5"></polyline>
             </svg>
@@ -38,7 +37,8 @@
         </a>
 
         <button onclick="window.print()" class="btn-temple btn-temple-primary btn-temple-sm">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <polyline points="6 9 6 2 18 2 18 9"></polyline>
                 <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
                 <rect x="6" y="14" width="12" height="8"></rect>
@@ -47,12 +47,16 @@
         </button>
     </div>
 
+    {{-- ── Premium Voucher Slip ── --}}
+    {{-- Screen: A4-width card with shadow. Print: full A4, 8mm clip margin --}}
     <div class="print-voucher-wrapper">
 
         {{-- Header --}}
         <div class="voucher-header">
             <div class="voucher-invocation">|| ഓം നമഃ ശിവായ || ശുഭം ഭവതു ||</div>
-            <h1 class="voucher-temple-name">{{ config('app.temple_name', 'TempleMitra Devasthanam') }}</h1>
+            <h1 class="voucher-temple-name">
+                {{ config('app.temple_name', 'TempleMitra Devasthanam') }}
+            </h1>
             <div class="voucher-type-subtitle">Vazhipad &amp; Pooja Dakshina Receipt</div>
         </div>
 
@@ -112,7 +116,7 @@
             <span>₹{{ number_format($receipt->total_amount, 2) }}</span>
         </div>
 
-        {{-- Payment Status Info Box --}}
+        {{-- Payment Info --}}
         <div class="voucher-payment-box">
             <div>
                 <span><strong>Status:</strong></span>
@@ -129,7 +133,9 @@
             @if($receipt->transaction_id)
                 <div>
                     <span><strong>Txn ID:</strong></span>
-                    <span style="font-family: monospace; font-weight: 600;">{{ $receipt->transaction_id }}</span>
+                    <span style="font-family: monospace; font-weight: 600;">
+                        {{ $receipt->transaction_id }}
+                    </span>
                 </div>
             @endif
             @if($receipt->paid_amount)
@@ -140,10 +146,12 @@
             @endif
         </div>
 
+        {{-- Blessing --}}
         <div class="voucher-blessing">
             "May the divine grace and blessings be upon you and your family."
         </div>
 
+        {{-- Signature Row --}}
         <div class="voucher-sign-row">
             <div>
                 <small>{{ date('d/m/Y h:i A') }}</small>
@@ -154,7 +162,7 @@
             </div>
         </div>
 
-    </div>
+    </div>{{-- /.print-voucher-wrapper --}}
 
 </body>
 </html>

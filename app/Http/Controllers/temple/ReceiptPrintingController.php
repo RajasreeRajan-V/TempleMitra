@@ -24,7 +24,6 @@ class ReceiptPrintingController extends Controller
         $query = Receipt::with('items.vazhipad')
             ->latest('id');
 
-
         /*
         |--------------------------------------------------------------------------
         | Search
@@ -44,7 +43,6 @@ class ReceiptPrintingController extends Controller
             });
         }
 
-
         /*
         |--------------------------------------------------------------------------
         | Payment Status Filter
@@ -59,68 +57,85 @@ class ReceiptPrintingController extends Controller
             );
         }
 
-
         /*
         |--------------------------------------------------------------------------
         | SUMMARY
         |--------------------------------------------------------------------------
-        |
-        | Calculate these BEFORE pagination.
-        |
-        | This is important because $receipts after paginate(20)
-        | contains only 20 records.
-        |
         */
 
         $summaryQuery = clone $query;
 
+        /*
+        |--------------------------------------------------------------------------
+        | TOTAL RECEIPTS
+        |--------------------------------------------------------------------------
+        */
 
-        // Total receipts
-        $totalCount = $summaryQuery->count();
+        $totalCount = (clone $summaryQuery)->count();
 
+        /*
+        |--------------------------------------------------------------------------
+        | PAID RECEIPTS COUNT
+        |--------------------------------------------------------------------------
+        */
 
-        // Fully paid receipts
         $paidCount = (clone $summaryQuery)
             ->where('payment_status', 'paid')
             ->count();
 
+        /*
+        |--------------------------------------------------------------------------
+        | PENDING RECEIPTS COUNT
+        |--------------------------------------------------------------------------
+        */
 
-        // Pending + partially paid
+        $pendingStatuses = [
+            'pending',
+            'partially_paid',
+        ];
+
         $pendingCount = (clone $summaryQuery)
-            ->whereIn(
-                'payment_status',
-                [
-                    'pending',
-                    'partially_paid'
-                ]
-            )
+            ->whereIn('payment_status', $pendingStatuses)
             ->count();
-
 
         /*
         |--------------------------------------------------------------------------
-        | COLLECTED AMOUNT
+        | TOTAL COLLECTED
         |--------------------------------------------------------------------------
-        |
-        | IMPORTANT:
-        |
-        | Collected Amount = paid_amount
-        |
-        | Only receipts with payment_status = paid.
-        |
-        | This calculation is done directly in MySQL,
-        | so pagination does NOT affect the result.
-        |
         */
 
         $totalCollected = (float) (clone $summaryQuery)
             ->where('payment_status', 'paid')
             ->sum('paid_amount');
 
+        /*
+        |--------------------------------------------------------------------------
+        | TOTAL PENDING AMOUNT
+        |--------------------------------------------------------------------------
+        */
+
+        $pendingTotalDue = (float) (clone $summaryQuery)
+            ->whereIn('payment_status', $pendingStatuses)
+            ->sum('total_amount');
+
+        $pendingAlreadyPaid = (float) (clone $summaryQuery)
+            ->whereIn('payment_status', $pendingStatuses)
+            ->sum('paid_amount');
 
         /*
         |--------------------------------------------------------------------------
-        | Paginated Receipts
+        | FINAL PENDING AMOUNT
+        |--------------------------------------------------------------------------
+        */
+
+        $totalPending = max(
+            0,
+            $pendingTotalDue - $pendingAlreadyPaid
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | PAGINATED RECEIPTS
         |--------------------------------------------------------------------------
         */
 
@@ -128,10 +143,9 @@ class ReceiptPrintingController extends Controller
             ->paginate(20)
             ->withQueryString();
 
-
         /*
         |--------------------------------------------------------------------------
-        | Send Data To Blade
+        | SEND DATA TO BLADE
         |--------------------------------------------------------------------------
         */
 
@@ -142,14 +156,14 @@ class ReceiptPrintingController extends Controller
                 'totalCount',
                 'paidCount',
                 'pendingCount',
-                'totalCollected'
+                'totalCollected',
+                'totalPending'
             )
         );
     }
 
-
     /**
-     * Display a single receipt.
+     * Show single receipt.
      */
     public function show(Receipt $receipt): View
     {
@@ -160,7 +174,6 @@ class ReceiptPrintingController extends Controller
             compact('receipt')
         );
     }
-
 
     /**
      * Display printable receipt.
@@ -175,7 +188,6 @@ class ReceiptPrintingController extends Controller
         );
     }
 
-
     /**
      * Display payment form.
      */
@@ -189,14 +201,19 @@ class ReceiptPrintingController extends Controller
         );
     }
 
-
     /**
-     * Mark/update payment.
+     * Mark / update payment.
      */
     public function markPayment(
         Request $request,
         Receipt $receipt
     ): RedirectResponse {
+
+        /*
+        |--------------------------------------------------------------------------
+        | Validate Payment
+        |--------------------------------------------------------------------------
+        */
 
         $validated = $request->validate([
 
@@ -207,7 +224,23 @@ class ReceiptPrintingController extends Controller
 
             'payment_method' => [
                 'nullable',
-                'in:cash,upi,card,bank_transfer'
+                'in:cash,upi,card,bank_transfer,other'
+            ],
+
+            /*
+            |--------------------------------------------------------------------------
+            | Transaction ID
+            |--------------------------------------------------------------------------
+            |
+            | Transaction ID is optional because cash payments normally
+            | do not have a transaction ID.
+            |
+            */
+
+            'transaction_id' => [
+                'nullable',
+                'string',
+                'max:255'
             ],
 
             'paid_amount' => [
@@ -218,11 +251,15 @@ class ReceiptPrintingController extends Controller
 
         ]);
 
+        /*
+        |--------------------------------------------------------------------------
+        | Receipt Total
+        |--------------------------------------------------------------------------
+        */
 
         $totalAmount = (float) $receipt->total_amount;
 
         $paidAmount = (float) $validated['paid_amount'];
-
 
         /*
         |--------------------------------------------------------------------------
@@ -239,7 +276,6 @@ class ReceiptPrintingController extends Controller
                 ])
                 ->withInput();
         }
-
 
         /*
         |--------------------------------------------------------------------------
@@ -259,7 +295,6 @@ class ReceiptPrintingController extends Controller
                 ])
                 ->withInput();
         }
-
 
         /*
         |--------------------------------------------------------------------------
@@ -283,14 +318,10 @@ class ReceiptPrintingController extends Controller
                 ->withInput();
         }
 
-
         /*
         |--------------------------------------------------------------------------
         | Pending
         |--------------------------------------------------------------------------
-        |
-        | If status is pending, normally paid amount should be 0.
-        |
         */
 
         if (
@@ -305,7 +336,6 @@ class ReceiptPrintingController extends Controller
                 ])
                 ->withInput();
         }
-
 
         /*
         |--------------------------------------------------------------------------
@@ -326,6 +356,17 @@ class ReceiptPrintingController extends Controller
                 ->withInput();
         }
 
+        /*
+        |--------------------------------------------------------------------------
+        | Transaction ID Handling
+        |--------------------------------------------------------------------------
+        |
+        | Cash payments don't need a transaction ID.
+        | For other payment methods, save the entered transaction ID.
+        |
+        */
+
+        $transactionId = $validated['transaction_id'] ?? null;
 
         /*
         |--------------------------------------------------------------------------
@@ -341,16 +382,27 @@ class ReceiptPrintingController extends Controller
             'payment_method' =>
                 $validated['payment_method'] ?? null,
 
+            'transaction_id' =>
+                $transactionId,
+
             'paid_amount' =>
                 $paidAmount,
 
             'paid_at' =>
-                $validated['payment_status'] === 'paid'
+                in_array(
+                    $validated['payment_status'],
+                    ['paid', 'partially_paid']
+                )
                     ? now()
                     : null,
 
         ]);
 
+        /*
+        |--------------------------------------------------------------------------
+        | Redirect
+        |--------------------------------------------------------------------------
+        */
 
         return redirect()
             ->route(

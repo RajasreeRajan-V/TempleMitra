@@ -9,11 +9,25 @@ class Vazhipad extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'description', 'price', 'status'];
+    protected $fillable = [
+        'temple_id',
+        'name',
+        'description',
+        'price',
+        'status',
+    ];
 
     protected $casts = [
         'price' => 'decimal:2',
     ];
+
+    public function temple()
+    {
+        return $this->belongsTo(
+            TemplesRegistration::class,
+            'temple_id'
+        );
+    }
 
     public function receipts()
     {

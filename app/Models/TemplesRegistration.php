@@ -30,4 +30,20 @@ protected $casts = [
     ];
     protected $hidden = [
     ];
+    
+    public function vazhipads()
+{
+    return $this->hasMany(
+        Vazhipad::class,
+        'temple_id'
+    );
+}
+
+public function receipts()
+{
+    return $this->hasMany(
+        Receipt::class,
+        'temple_id'
+    );
+}
 }

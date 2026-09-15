@@ -11,17 +11,18 @@ use Illuminate\View\View;
 class ReceiptPrintingController extends Controller
 {
     /**
-     * Display all receipts for printing.
+     * Display only receipts belonging to the logged-in temple.
      */
     public function index(Request $request): View
     {
-        /*
-        |--------------------------------------------------------------------------
-        | Receipt Query
-        |--------------------------------------------------------------------------
-        */
+        $templeId = session('temple_id');
+
+        if (!$templeId) {
+            abort(403, 'Temple login required.');
+        }
 
         $query = Receipt::with('items.vazhipad')
+            ->where('temple_id', $templeId)
             ->latest('id');
 
         /*
@@ -163,10 +164,12 @@ class ReceiptPrintingController extends Controller
     }
 
     /**
-     * Show single receipt.
+     * Show a receipt only if it belongs to the logged-in temple.
      */
     public function show(Receipt $receipt): View
     {
+        $this->checkTempleOwnership($receipt);
+
         $receipt->load('items.vazhipad');
 
         return view(
@@ -180,6 +183,8 @@ class ReceiptPrintingController extends Controller
      */
     public function print(Receipt $receipt): View
     {
+        $this->checkTempleOwnership($receipt);
+
         $receipt->load('items.vazhipad');
 
         return view(
@@ -193,6 +198,8 @@ class ReceiptPrintingController extends Controller
      */
     public function paymentForm(Receipt $receipt): View
     {
+        $this->checkTempleOwnership($receipt);
+
         $receipt->load('items.vazhipad');
 
         return view(
@@ -211,6 +218,14 @@ class ReceiptPrintingController extends Controller
 
         /*
         |--------------------------------------------------------------------------
+        | SECURITY CHECK
+        |--------------------------------------------------------------------------
+        */
+
+        $this->checkTempleOwnership($receipt);
+
+        /*
+        |--------------------------------------------------------------------------
         | Validate Payment
         |--------------------------------------------------------------------------
         */
@@ -226,16 +241,6 @@ class ReceiptPrintingController extends Controller
                 'nullable',
                 'in:cash,upi,card,bank_transfer,other'
             ],
-
-            /*
-            |--------------------------------------------------------------------------
-            | Transaction ID
-            |--------------------------------------------------------------------------
-            |
-            | Transaction ID is optional because cash payments normally
-            | do not have a transaction ID.
-            |
-            */
 
             'transaction_id' => [
                 'nullable',
@@ -358,12 +363,8 @@ class ReceiptPrintingController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Transaction ID Handling
+        | Transaction ID
         |--------------------------------------------------------------------------
-        |
-        | Cash payments don't need a transaction ID.
-        | For other payment methods, save the entered transaction ID.
-        |
         */
 
         $transactionId = $validated['transaction_id'] ?? null;
@@ -413,5 +414,21 @@ class ReceiptPrintingController extends Controller
                 'success',
                 'Payment updated successfully.'
             );
+    }
+
+    /**
+     * Check whether the receipt belongs to the logged-in temple.
+     */
+    private function checkTempleOwnership(Receipt $receipt): void
+    {
+        $templeId = session('temple_id');
+
+        if (!$templeId) {
+            abort(403, 'Temple login required.');
+        }
+
+        if ($receipt->temple_id != $templeId) {
+            abort(403, 'Unauthorized access.');
+        }
     }
 }

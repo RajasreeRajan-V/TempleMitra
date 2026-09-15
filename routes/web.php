@@ -6,7 +6,7 @@ use App\Http\Controllers\Temple\TempleDashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\VazhipadController;
-use App\Http\Controllers\Admin\receiptsController;
+use App\Http\Controllers\Admin\ReceiptsController;
 use App\Http\Controllers\Temple\ReceiptPrintingController;
 use App\Http\Controllers\Temple\ReceiptReportController;
 use App\Http\Controllers\Temple\TempleProfileController;
@@ -70,7 +70,7 @@ Route::prefix('temple')
 
         Route::resource(
             'receipts',
-            receiptsController::class
+            ReceiptsController::class
         );
 
 
@@ -82,7 +82,7 @@ Route::prefix('temple')
 
         Route::post(
             'receipts/confirm',
-            [receiptsController::class, 'confirm']
+            [ReceiptsController::class, 'confirm']
         )->name('receipts.confirm');
 
 
@@ -94,7 +94,7 @@ Route::prefix('temple')
 
         Route::get(
             'receipts/vazhipad/{vazhipad}/details',
-            [receiptsController::class, 'vazhipadDetails']
+            [ReceiptsController::class, 'vazhipadDetails']
         )->name('receipts.vazhipad-details');
     });
 

@@ -9,22 +9,23 @@ class Receipt extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'devotee_id',
-        'receipt_date',
-        'vazhipad_id',
-        'devotee_name',
-        'nakshatram',
-        'receipts_date',
-        'total_amount',
-        'payment_status',
-        'payment_method',
-        'transaction_id', // ADD THIS
-        'paid_amount',
-        'paid_at',
-        'amount',
-        'status',
-    ];
+   protected $fillable = [
+    'temple_id',
+    'devotee_id',
+    'receipt_date',
+    'vazhipad_id',
+    'devotee_name',
+    'nakshatram',
+    'receipts_date',
+    'total_amount',
+    'payment_status',
+    'payment_method',
+    'transaction_id',
+    'paid_amount',
+    'paid_at',
+    'amount',
+    'status',
+];
 
     protected $casts = [
         'receipt_date'  => 'date',
@@ -60,4 +61,11 @@ class Receipt extends Model
         $this->total_amount = $this->items()->sum('amount');
         $this->save();
     }
+    public function temple()
+{
+    return $this->belongsTo(
+        TemplesRegistration::class,
+        'temple_id'
+    );
+}
 }

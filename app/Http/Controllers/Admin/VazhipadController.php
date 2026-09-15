@@ -10,9 +10,16 @@ class VazhipadController extends Controller
 {
     public function index()
     {
-        $vazhipads = Vazhipad::latest()->get();
+        $templeId = session('temple_id');
 
-        return view('temple.vazhipad.index', compact('vazhipads'));
+        $vazhipads = Vazhipad::where('temple_id', $templeId)
+            ->latest()
+            ->get();
+
+        return view(
+            'temple.vazhipad.index',
+            compact('vazhipads')
+        );
     }
 
     public function create()
@@ -24,6 +31,8 @@ class VazhipadController extends Controller
     {
         $validated = $this->validateRequest($request);
 
+        $validated['temple_id'] = session('temple_id');
+
         Vazhipad::create($validated);
 
         return redirect()
@@ -33,16 +42,30 @@ class VazhipadController extends Controller
 
     public function show(Vazhipad $vazhipad)
     {
-        return view('temple.vazhipad.show', compact('vazhipad'));
+        $this->checkTempleOwnership($vazhipad);
+
+        return view(
+            'temple.vazhipad.show',
+            compact('vazhipad')
+        );
     }
 
     public function edit(Vazhipad $vazhipad)
     {
-        return view('temple.vazhipad.edit', compact('vazhipad'));
+        $this->checkTempleOwnership($vazhipad);
+
+        return view(
+            'temple.vazhipad.edit',
+            compact('vazhipad')
+        );
     }
 
-    public function update(Request $request, Vazhipad $vazhipad)
-    {
+    public function update(
+        Request $request,
+        Vazhipad $vazhipad
+    ) {
+        $this->checkTempleOwnership($vazhipad);
+
         $validated = $this->validateRequest($request);
 
         $vazhipad->update($validated);
@@ -53,22 +76,37 @@ class VazhipadController extends Controller
     }
 
     public function destroy(Vazhipad $vazhipad)
-{
-    $vazhipad->update([
-        'is_active' => false,
-        'status' => 'inactive',
-    ]);return redirect()
-    ->route('temple.vazhipad.index')
-    ->with('success', 'Vazhipad deactivated successfully.');
-}
+    {
+        $this->checkTempleOwnership($vazhipad);
 
-private function validateRequest(Request $request): array
-{
-    return $request->validate([
-        'name'        => 'required|string|max:255',
-        'description' => 'nullable|string',
-        'price'       => 'required|numeric|min:0',
-        'status'      => 'required|in:active,inactive',
-    ]);
-}
+        $vazhipad->update([
+            'status' => 'inactive',
+        ]);
+
+        return redirect()
+            ->route('temple.vazhipad.index')
+            ->with(
+                'success',
+                'Vazhipad deactivated successfully.'
+            );
+    }
+
+    private function validateRequest(Request $request): array
+    {
+        return $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'price' => 'required|numeric|min:0',
+            'status' => 'required|in:active,inactive',
+        ]);
+    }
+
+    private function checkTempleOwnership(Vazhipad $vazhipad): void
+    {
+        abort_if(
+            $vazhipad->temple_id != session('temple_id'),
+            403,
+            'Unauthorized access.'
+        );
+    }
 }

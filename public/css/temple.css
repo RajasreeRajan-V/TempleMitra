@@ -80,6 +80,7 @@ body {
         opacity: 0;
         transform: translateY(-8px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -815,8 +816,13 @@ body {
 }
 
 @keyframes templeFadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 .temple-modal-card {
@@ -835,6 +841,7 @@ body {
         opacity: 0;
         transform: scale(0.94) translateY(12px);
     }
+
     to {
         opacity: 1;
         transform: scale(1) translateY(0);
@@ -956,7 +963,8 @@ body {
     margin-bottom: 6px;
 }
 
-.form-control, .form-select {
+.form-control,
+.form-select {
     width: 100%;
     padding: 10px 14px;
     font-size: 14px;
@@ -969,12 +977,14 @@ body {
     transition: var(--transition-fast);
 }
 
-.form-control:focus, .form-select:focus {
+.form-control:focus,
+.form-select:focus {
     border-color: var(--maroon-700);
     box-shadow: 0 0 0 3px rgba(110, 26, 38, 0.1);
 }
 
-.form-control.is-invalid, .form-select.is-invalid {
+.form-control.is-invalid,
+.form-select.is-invalid {
     border-color: var(--red-500);
 }
 
@@ -1337,7 +1347,9 @@ body {
     text-transform: capitalize;
 }
 
-.status--confirmed, .status--completed, .status--paid {
+.status--confirmed,
+.status--completed,
+.status--paid {
     background-color: var(--green-50);
     color: var(--green-700);
     border: 1px solid rgba(31, 157, 85, 0.25);
@@ -1379,7 +1391,8 @@ body {
     background-color: var(--blue-600);
 }
 
-.status--cancelled, .status--failed {
+.status--cancelled,
+.status--failed {
     background-color: var(--red-50);
     color: var(--red-600);
     border: 1px solid rgba(239, 68, 68, 0.25);
@@ -1622,8 +1635,15 @@ body {
 }
 
 @keyframes successPop {
-    0% { transform: scale(0.5); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 .success-title {
@@ -1900,6 +1920,7 @@ body {
         opacity: 0;
         transform: translateY(-6px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -2473,16 +2494,24 @@ body {
         font-size: 12pt;
     }
 
-    .sidebar, .topbar, .vazhipad-header, .receipt-action-bar, .temple-alert, .no-print, button:not(.printable-btn) {
+    .sidebar,
+    .topbar,
+    .vazhipad-header,
+    .receipt-action-bar,
+    .temple-alert,
+    .no-print,
+    button:not(.printable-btn) {
         display: none !important;
     }
 
-    .main-col, .page-body {
+    .main-col,
+    .page-body {
         padding: 0 !important;
         margin: 0 !important;
     }
 
-    .receipt-view-container, .receipt-page-container {
+    .receipt-view-container,
+    .receipt-page-container {
         max-width: 100% !important;
         width: 100% !important;
         margin: 0 !important;
@@ -2536,5 +2565,1073 @@ body {
         background: #f0ece4 !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
+    }
+}
+
+/* ==========================================================================
+   TEMPLE PAGINATION COMPONENT
+   ========================================================================== */
+
+.temple-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 14px 20px;
+    border-top: 1px solid var(--line-light);
+    background: var(--cream-50);
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+/* ---------- Mobile view: prev/next only ---------- */
+.temple-pagination__mobile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+@media (min-width: 640px) {
+    .temple-pagination__mobile {
+        display: none;
+    }
+}
+
+/* ---------- Desktop: info + full pages ---------- */
+.temple-pagination__desktop {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+@media (min-width: 640px) {
+    .temple-pagination__desktop {
+        display: flex;
+    }
+}
+
+/* ---------- Info text ---------- */
+.temple-pagination__info {
+    font-size: 13px;
+    color: var(--ink-600);
+    margin: 0;
+    line-height: 1.4;
+}
+
+.temple-pagination__info strong {
+    color: var(--ink-900);
+    font-weight: 700;
+}
+
+/* ---------- Pages wrapper ---------- */
+.temple-pagination__pages {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* ---------- Individual page button ---------- */
+.temple-pagination__page-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 10px;
+    font-size: 13.5px;
+    font-weight: 500;
+    font-family: 'Poppins', system-ui, sans-serif;
+    color: var(--ink-700);
+    background: #ffffff;
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
+    line-height: 1;
+}
+
+.temple-pagination__page-btn:hover {
+    background: var(--cream-50);
+    border-color: var(--gold-400);
+    color: var(--maroon-800);
+    text-decoration: none;
+}
+
+/* Nav arrow buttons (prev/next) — fixed 36×36 */
+.temple-pagination__page-btn--nav {
+    padding: 0;
+    width: 36px;
+    flex-shrink: 0;
+}
+
+.temple-pagination__page-btn--nav svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    display: block;
+}
+
+/* Active (current) page */
+.temple-pagination__page-btn--active {
+    background: linear-gradient(135deg, var(--maroon-700), var(--maroon-900));
+    border-color: var(--maroon-800);
+    color: var(--gold-300);
+    font-weight: 700;
+    cursor: default;
+    box-shadow: 0 2px 8px rgba(74, 15, 24, 0.22);
+}
+
+.temple-pagination__page-btn--active:hover {
+    background: linear-gradient(135deg, var(--maroon-700), var(--maroon-900));
+    border-color: var(--maroon-800);
+    color: var(--gold-300);
+}
+
+/* Disabled (grayed out prev/next) */
+.temple-pagination__page-btn--disabled {
+    color: var(--ink-300, #c5b9a8);
+    background: var(--cream-50);
+    border-color: var(--line-light);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.temple-pagination__page-btn--disabled:hover {
+    background: var(--cream-50);
+    border-color: var(--line-light);
+    color: var(--ink-300, #c5b9a8);
+}
+
+/* Dots separator */
+.temple-pagination__page-btn--dots {
+    border: none;
+    background: transparent;
+    cursor: default;
+    color: var(--ink-400);
+    padding: 0 4px;
+    min-width: auto;
+}
+
+.temple-pagination__page-btn--dots:hover {
+    background: transparent;
+    border-color: transparent;
+    color: var(--ink-400);
+}
+
+/* ---------- Mobile prev/next button ---------- */
+.temple-pagination__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    font-size: 13.5px;
+    font-weight: 600;
+    font-family: 'Poppins', system-ui, sans-serif;
+    color: var(--ink-800);
+    background: #ffffff;
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background var(--transition-fast), border-color var(--transition-fast);
+    line-height: 1;
+}
+
+.temple-pagination__btn svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+.temple-pagination__btn:hover {
+    background: var(--cream-50);
+    border-color: var(--gold-400);
+    color: var(--maroon-800);
+    text-decoration: none;
+}
+
+.temple-pagination__btn--disabled {
+    color: var(--ink-400);
+    background: var(--cream-50);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.temple-pagination__btn--disabled:hover {
+    background: var(--cream-50);
+    border-color: var(--line);
+    color: var(--ink-400);
+}
+
+/* ---------- Report page pagination wrapper ---------- */
+.report-pagination-wrap {
+    padding: 0;
+}
+
+/* ==========================================================================
+   REPORT PAGES — ENHANCED STYLES
+   (index, daily, receipts, collections, vazhipads, devotees)
+   ========================================================================== */
+
+/* ---------- Filter Panel ---------- */
+.report-filter-panel {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.6));
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: var(--radius-lg);
+    padding: 24px 28px;
+    margin-bottom: 28px;
+    box-shadow: 0 10px 32px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.report-filter-panel:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.report-filter-form {
+    display: flex;
+    gap: 20px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.report-filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+    min-width: 220px;
+}
+
+.report-filter-field label {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-700);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.report-filter-field input[type="date"],
+.report-filter-field input[type="text"],
+.report-filter-field select {
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid var(--line-light);
+    border-radius: var(--radius-md);
+    padding: 12px 16px;
+    font-size: 14.5px;
+    color: var(--ink-900);
+    transition: all 0.3s ease;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.report-filter-field input[type="date"]:focus,
+.report-filter-field input[type="text"]:focus,
+.report-filter-field select:focus {
+    background: #ffffff;
+    border-color: var(--gold-400);
+    box-shadow: 0 0 0 4px rgba(220, 169, 58, 0.15), inset 0 2px 4px rgba(0, 0, 0, 0.01);
+    outline: none;
+}
+
+
+/* ---------- Quick Link Buttons in Panel ---------- */
+.report-quick-links {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 4px 0;
+}
+
+/* ---------- Source Breakdown list in Collections ---------- */
+.report-source-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--line-light);
+    font-size: 13.5px;
+    transition: background var(--transition-fast);
+}
+
+.report-source-list-item:last-child {
+    border-bottom: none;
+}
+
+.report-source-list-item:hover {
+    background: var(--cream-50);
+}
+
+.report-source-list-item__label {
+    color: var(--ink-800);
+}
+
+.report-source-list-item__amount {
+    font-weight: 700;
+    font-family: 'Noto Serif', Georgia, serif;
+    color: var(--maroon-700);
+}
+
+/* ---------- Table footer total row ---------- */
+.report-table-total-row td {
+    background: linear-gradient(135deg, var(--maroon-800), var(--maroon-900)) !important;
+    border-top: none;
+    font-weight: 800;
+    color: #ffffff;
+    padding: 16px 24px;
+    font-size: 15px;
+    letter-spacing: 0.02em;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.report-table-total-row td:first-child {
+    border-radius: 0 0 0 var(--radius-lg);
+}
+
+.report-table-total-row td:last-child {
+    border-radius: 0 0 var(--radius-lg) 0;
+}
+
+/* ---------- Stat Cards (index page) ---------- */
+.report-index-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.report-index-stat-card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    background: #ffffff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: 20px 22px;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow var(--transition-normal), transform var(--transition-normal), border-color var(--transition-normal);
+    position: relative;
+    overflow: hidden;
+}
+
+.report-index-stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--maroon-700), var(--gold-500));
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.report-index-stat-card:hover {
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-2px);
+    border-color: var(--gold-300);
+    text-decoration: none;
+    color: inherit;
+}
+
+/* ---------- Collections layout grid ---------- */
+.report-collections-layout {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 20px;
+    align-items: start;
+}
+
+@media (max-width: 900px) {
+    .report-collections-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ---------- Print: hide pagination ---------- */
+@media print {
+
+    .temple-pagination,
+    .report-pagination-wrap {
+        display: none !important;
+    }
+}
+
+/* ==========================================================================
+   REPORT PAGES — PREMIUM TABLE, PANEL & DATE FILTER UPGRADES
+   ========================================================================== */
+
+/* --- Date Filter Panel: shimmer top-bar animation --- */
+.report-filter-panel {
+    border: 1.5px solid rgba(220, 169, 58, 0.2) !important;
+    border-radius: 18px !important;
+    padding: 26px 30px !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.report-filter-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--maroon-700), var(--gold-500), var(--maroon-700));
+    background-size: 200% 100%;
+    animation: rp-shimmer 4s linear infinite;
+    border-radius: 18px 18px 0 0;
+}
+
+@keyframes rp-shimmer {
+    0%   { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+/* Date inputs — premium style */
+.report-filter-field input[type="date"],
+.report-filter-field input[type="text"],
+.report-filter-field select {
+    width: 100%;
+    background: linear-gradient(180deg, #ffffff 0%, #fffdf8 100%);
+    border: 1.5px solid rgba(107, 30, 43, 0.14) !important;
+    border-radius: 12px !important;
+    padding: 13px 18px !important;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--ink-900);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), inset 0 1px 3px rgba(0, 0, 0, 0.02);
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.report-filter-field input[type="date"]:hover,
+.report-filter-field input[type="text"]:hover,
+.report-filter-field select:hover {
+    border-color: var(--gold-400) !important;
+    box-shadow: 0 4px 16px rgba(220, 169, 58, 0.1), inset 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+}
+
+.report-filter-field input[type="date"]:focus,
+.report-filter-field input[type="text"]:focus,
+.report-filter-field select:focus {
+    background: #fffdf8 !important;
+    border-color: var(--gold-500) !important;
+    box-shadow: 0 0 0 4px rgba(220, 169, 58, 0.18), 0 4px 20px rgba(0, 0, 0, 0.06) !important;
+    outline: none;
+    transform: translateY(-1px);
+}
+
+/* ---------- Report Panel (card wrapper) ---------- */
+.panel {
+    background: #ffffff;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.05), 0 1px 4px rgba(0, 0, 0, 0.03);
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    margin-bottom: 24px;
+}
+
+.panel:hover {
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.09);
+}
+
+/* ---------- Panel Header ---------- */
+.panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 26px;
+    background: linear-gradient(135deg, #fdfaf4 0%, #fff8ee 50%, #fdf6f0 100%);
+    border-bottom: 1.5px solid var(--line-light);
+    gap: 14px;
+    flex-wrap: wrap;
+    position: relative;
+}
+
+.panel-header::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 26px;
+    right: 26px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-300), transparent);
+}
+
+.panel-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15.5px;
+    font-weight: 700;
+    font-family: 'Poppins', system-ui, sans-serif;
+    color: var(--ink-900);
+    margin: 0;
+    letter-spacing: -0.01em;
+}
+
+.panel-title svg {
+    color: var(--maroon-700);
+    flex-shrink: 0;
+}
+
+/* --- Amount Badge in panel header --- */
+.panel-amount-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 18px;
+    background: linear-gradient(135deg, var(--maroon-700) 0%, var(--maroon-800) 100%);
+    color: #ffffff;
+    border-radius: 100px;
+    font-size: 13.5px;
+    font-weight: 800;
+    font-family: 'Noto Serif', Georgia, serif;
+    letter-spacing: 0.02em;
+    box-shadow: 0 4px 14px rgba(107, 30, 43, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.panel-amount-badge:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(107, 30, 43, 0.35);
+}
+
+/* ---------- Table Wrapper ---------- */
+.table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: var(--line) transparent;
+}
+
+.table-wrap::-webkit-scrollbar { height: 4px; }
+.table-wrap::-webkit-scrollbar-track { background: transparent; }
+.table-wrap::-webkit-scrollbar-thumb { background: var(--line); border-radius: 2px; }
+
+/* ---------- Premium Data Table ---------- */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    table-layout: auto;
+}
+
+.data-table thead tr {
+    background: linear-gradient(135deg, #fdf8f0 0%, #fef6ea 100%);
+}
+
+.data-table th {
+    padding: 15px 22px;
+    font-size: 10.5px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--maroon-800);
+    border-bottom: 2px solid rgba(107, 30, 43, 0.12);
+    text-align: left;
+    white-space: nowrap;
+    background: transparent;
+}
+
+.data-table th.text-right,
+.data-table td.text-right {
+    text-align: right;
+}
+
+.data-table td {
+    padding: 15px 22px;
+    color: var(--ink-800);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    vertical-align: middle;
+    font-size: 13.5px;
+    transition: background 0.16s ease;
+    line-height: 1.5;
+}
+
+.data-table tbody tr { transition: background 0.16s ease; }
+
+.data-table tbody tr:hover td {
+    background: linear-gradient(135deg, #fffdf8, #fffbf0);
+}
+
+.data-table tbody tr:nth-child(even) td {
+    background: rgba(253, 250, 244, 0.5);
+}
+
+.data-table tbody tr:nth-child(even):hover td {
+    background: linear-gradient(135deg, #fffdf8, #fffbf0);
+}
+
+.data-table tbody tr:last-child td { border-bottom: none; }
+
+/* First column — serial number dimmed */
+.data-table td:first-child {
+    font-weight: 600;
+    color: var(--ink-500);
+    font-size: 12.5px;
+}
+
+/* Amount column */
+.data-table td.text-right {
+    font-weight: 700;
+    font-family: 'Noto Serif', Georgia, serif;
+    color: var(--maroon-700);
+    font-size: 14px;
+}
+
+/* Empty state */
+.empty-row,
+.data-table .empty-row {
+    text-align: center !important;
+    padding: 60px 20px !important;
+    color: var(--ink-500);
+    font-size: 14px;
+    font-style: italic;
+    background: #fdfcf9 !important;
+}
+
+/* Grand-total row */
+.report-table-total-row td {
+    background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-900) 100%) !important;
+    border-top: none !important;
+    font-weight: 800 !important;
+    color: #ffffff !important;
+    padding: 17px 22px !important;
+    font-size: 14.5px !important;
+    letter-spacing: 0.02em;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+.report-table-total-row td.text-right {
+    font-family: 'Noto Serif', Georgia, serif !important;
+    color: var(--gold-300) !important;
+    font-size: 16px !important;
+}
+
+/* ---------- Status Badges ---------- */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 100px;
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: capitalize;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+}
+
+.badge--green {
+    background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+    color: #15803d;
+    border: 1px solid rgba(22, 163, 74, 0.22);
+    box-shadow: 0 2px 6px rgba(22, 163, 74, 0.14);
+}
+
+.badge--orange {
+    background: linear-gradient(135deg, #fff7ed, #fed7aa);
+    color: #c2410c;
+    border: 1px solid rgba(234, 88, 12, 0.22);
+    box-shadow: 0 2px 6px rgba(234, 88, 12, 0.14);
+}
+
+.badge--red {
+    background: linear-gradient(135deg, #fee2e2, #fecaca);
+    color: #b91c1c;
+    border: 1px solid rgba(220, 38, 38, 0.22);
+    box-shadow: 0 2px 6px rgba(220, 38, 38, 0.14);
+}
+
+.badge--blue {
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+    color: #1d4ed8;
+    border: 1px solid rgba(37, 99, 235, 0.22);
+    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.14);
+}
+
+/* ---------- Report table amount column alignment fix ---------- */
+.data-table [style*="text-align:right"],
+.data-table [style*="text-align: right"] {
+    font-weight: 700;
+    font-family: 'Noto Serif', Georgia, serif;
+    color: var(--maroon-700);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 768px) {
+    .report-filter-panel {
+        padding: 18px 16px !important;
+    }
+    .report-filter-field {
+        min-width: 100%;
+    }
+    .panel-header {
+        padding: 14px 16px;
+        gap: 8px;
+    }
+    .panel-header::after {
+        left: 16px;
+        right: 16px;
+    }
+    .data-table th,
+    .data-table td {
+        padding: 12px 14px;
+        font-size: 12.5px;
+    }
+    .report-table-total-row td {
+        padding: 14px 14px !important;
+    }
+}
+
+/* ==========================================================================
+   PRINT VOUCHER — Premium Temple Receipt Clip Style
+   Page: A4  |  Clip margin: 8mm  |  Style: Premium Maroon & Gold
+   ========================================================================== */
+
+/* ---- Screen Toolbar ---- */
+.print-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    margin-bottom: 24px;
+    background: var(--cream-50);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+/* ---- Voucher Wrapper (screen preview) ---- */
+.print-voucher-wrapper {
+    width: 190mm;         /* A4 usable width minus 8mm clip each side */
+    max-width: 100%;
+    margin: 0 auto;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    padding: 22px 26px 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Gold accent stripe at top */
+.print-voucher-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, var(--maroon-900), var(--gold-500), var(--maroon-900));
+}
+
+/* ---- Header ---- */
+.voucher-header {
+    text-align: center;
+    padding: 10px 0 8px;
+}
+
+.voucher-invocation {
+    font-family: 'Cormorant Garamond', 'Noto Serif', Georgia, serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--maroon-700);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+
+.voucher-temple-name {
+    font-family: 'Cormorant Garamond', 'Noto Serif', Georgia, serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--maroon-900);
+    margin: 0 0 4px;
+    line-height: 1.2;
+    letter-spacing: 0.01em;
+}
+
+.voucher-type-subtitle {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--gold-600);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+/* ---- Divider ---- */
+.voucher-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-400), transparent);
+    margin: 10px 0;
+}
+
+/* ---- Meta Rows ---- */
+.voucher-meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;
+    font-size: 11.5px;
+    color: var(--ink-800);
+    border-bottom: 1px dashed var(--line-light);
+}
+.voucher-meta-row:last-of-type {
+    border-bottom: none;
+}
+
+/* ---- Offerings Table ---- */
+.voucher-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+    font-size: 11px;
+}
+
+.voucher-table thead tr {
+    background: linear-gradient(135deg, var(--maroon-900) 0%, var(--maroon-700) 100%);
+    color: #fff;
+}
+
+.voucher-table th {
+    padding: 7px 10px;
+    text-align: left;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.voucher-table tbody tr {
+    border-bottom: 1px solid var(--line-light);
+}
+
+.voucher-table tbody tr:nth-child(even) {
+    background: var(--gold-50);
+}
+
+.voucher-table td {
+    padding: 6px 10px;
+    color: var(--ink-800);
+    font-size: 11px;
+}
+
+/* ---- Total Banner ---- */
+.voucher-total-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, var(--maroon-900), var(--maroon-700));
+    color: #fff;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    font-weight: 800;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    margin: 8px 0;
+}
+
+.voucher-total-banner span:last-child {
+    font-family: 'Cormorant Garamond', 'Noto Serif', Georgia, serif;
+    font-size: 15px;
+    color: var(--gold-300);
+}
+
+/* ---- Payment Info Box ---- */
+.voucher-payment-box {
+    background: var(--gold-50);
+    border: 1px solid var(--gold-300);
+    border-radius: var(--radius-sm);
+    padding: 8px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 11px;
+    margin: 8px 0;
+}
+
+.voucher-payment-box div {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* ---- Blessing ---- */
+.voucher-blessing {
+    text-align: center;
+    font-family: 'Cormorant Garamond', 'Noto Serif', Georgia, serif;
+    font-size: 10.5px;
+    font-style: italic;
+    color: var(--ink-600);
+    padding: 10px 0 6px;
+}
+
+/* ---- Sign Row ---- */
+.voucher-sign-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 12px;
+    padding-top: 8px;
+    border-top: 1px solid var(--line-light);
+    font-size: 10px;
+    color: var(--ink-600);
+}
+
+.sign-line {
+    width: 80px;
+    height: 1px;
+    background: var(--ink-800);
+    margin-bottom: 4px;
+}
+
+.voucher-sign-row div {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+/* ==========================================================================
+   @media print — A4 page, 8mm clip margin, premium clean output
+   ========================================================================== */
+@media print {
+    /* A4 page size with 8mm clip margin all around */
+    @page {
+        size: A4 portrait;
+        margin: 8mm;
+    }
+
+    /* Hide non-print elements */
+    .no-print,
+    .print-toolbar {
+        display: none !important;
+    }
+
+    /* Reset body for clean print */
+    body {
+        background: #fff !important;
+        color: #000 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        font-family: 'Poppins', Arial, sans-serif;
+        font-size: 11pt;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    /* Voucher wrapper fills full A4 (minus @page margin) */
+    .print-voucher-wrapper {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 6mm 8mm !important;
+        border: none !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        background: #fff !important;
+        page-break-inside: avoid;
+    }
+
+    /* Keep decorative top stripe visible in print */
+    .print-voucher-wrapper::before {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    /* Header */
+    .voucher-temple-name {
+        font-size: 18pt !important;
+    }
+
+    .voucher-invocation {
+        font-size: 9pt !important;
+    }
+
+    .voucher-type-subtitle {
+        font-size: 8pt !important;
+    }
+
+    /* Meta rows */
+    .voucher-meta-row {
+        font-size: 9.5pt !important;
+        padding: 4px 0 !important;
+    }
+
+    /* Table */
+    .voucher-table {
+        font-size: 9pt !important;
+    }
+
+    .voucher-table th {
+        font-size: 8pt !important;
+        padding: 5px 8px !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .voucher-table thead tr {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .voucher-table td {
+        padding: 5px 8px !important;
+        font-size: 9pt !important;
+    }
+
+    .voucher-table tbody tr:nth-child(even) {
+        background: #fdf8e9 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    /* Total banner */
+    .voucher-total-banner {
+        font-size: 11pt !important;
+        padding: 8px 12px !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .voucher-total-banner span:last-child {
+        font-size: 13pt !important;
+    }
+
+    /* Payment box */
+    .voucher-payment-box {
+        font-size: 9pt !important;
+        padding: 6px 12px !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    /* Blessing */
+    .voucher-blessing {
+        font-size: 8.5pt !important;
+    }
+
+    /* Sign row */
+    .voucher-sign-row {
+        font-size: 8pt !important;
+    }
+
+    /* Avoid breaks inside key sections */
+    .voucher-header,
+    .voucher-meta-row,
+    .voucher-table,
+    .voucher-total-banner,
+    .voucher-payment-box,
+    .voucher-sign-row {
+        page-break-inside: avoid;
     }
 }

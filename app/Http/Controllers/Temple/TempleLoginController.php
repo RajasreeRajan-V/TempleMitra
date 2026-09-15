@@ -45,6 +45,7 @@ class TempleLoginController extends Controller
 
         if (!$temple) {
             return redirect()->back()
+                ->withErrors($validator)
                 ->with('error', 'Invalid email or password')
                 ->with('login_type', 'temple')
                 ->withInput();

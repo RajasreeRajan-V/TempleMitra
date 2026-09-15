@@ -9,7 +9,11 @@ class Devotee extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'phone', 'email', 'address', 'star'];
+    protected $fillable = [
+        'name',
+        'phone',
+        'email',
+    ];
 
     public function receipts()
     {
